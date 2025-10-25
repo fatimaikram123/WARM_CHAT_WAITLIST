@@ -24,7 +24,7 @@ import CampaignDetails from "./components/CampaignDetails";
 import NewCampaign from "./components/NewCampaign";
 import NewMessage from "./components/NewMessage";
 import Pricing from "./components/Pricing";
-import Waitlist from "./components/WaitList";
+import Waitlist from "./components/Waitlist";
 
 const queryClient = new QueryClient();
 
