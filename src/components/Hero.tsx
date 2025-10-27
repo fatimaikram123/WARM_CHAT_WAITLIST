@@ -87,16 +87,17 @@ const Hero: React.FC = () => {
           </div>
 
           {/* Right content (illustration) */}
-          <div className="flex-1 max-w-lg relative">
+      <div className="flex-1 max-w-lg relative">
+            {/* Decorative elements */}
             <div className="absolute -left-6 md:-left-10 -top-6 md:-top-10 w-16 md:w-20 h-16 md:h-20 bg-warmchats-primary-light rounded-full opacity-60 animate-float"></div>
             <div className="absolute -right-4 md:-right-8 bottom-6 md:bottom-10 w-12 md:w-16 h-12 md:h-16 bg-warmchats-flame-light rounded-full opacity-60 animate-float animation-delay-500"></div>
-
+            
             <div className="relative bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-50">
               {/* Header */}
-              <div className="bg-gradient-to-r from-warmchats-primary to-warmchats-primary-dark p-4 text-white">
-                <div className="flex items-center gap-2">
-                  <div className="p-1.5 bg-white bg-opacity-20 rounded-full">
-                    <Flame size={20} />
+              <div className="bg-gradient-to-r from-warmchats-primary to-warmchats-primary-dark p-3 md:p-5 text-white">
+                <div className="flex items-center gap-2 md:gap-3">
+                  <div className="p-1.5 md:p-2 bg-white bg-opacity-20 rounded-full">
+                    <Flame size={20} className="text-white md:w-6 md:h-6" />
                   </div>
                   <div>
                     <div className="text-sm md:text-lg font-bold">WarmChats Assistant</div>
@@ -104,42 +105,57 @@ const Hero: React.FC = () => {
                   </div>
                 </div>
               </div>
-
-              {/* Chat example */}
+              
+              {/* Content */}
               <div className="p-4 md:p-6">
-                <div className="border border-gray-100 bg-gray-50 p-3 rounded-lg mb-4">
+                <div className="border border-gray-100 bg-gray-50 p-3 md:p-4 rounded-lg mb-4 md:mb-6">
                   <div className="flex items-center gap-2 mb-2">
-                    <PenTool size={14} className="text-gray-500" />
+                    <PenTool size={14} className="text-gray-500 md:w-4 md:h-4" />
                     <span className="text-xs font-medium text-gray-500">Your prompt</span>
                   </div>
                   <p className="text-xs md:text-sm text-gray-600">
                     Write a personalized message to Sarah about our marketing software, mentioning her recent article on growth marketing.
                   </p>
                 </div>
-
-                <div className="border border-warmchats-primary-light p-4 rounded-lg bg-warmchats-primary-light bg-opacity-10 shadow-inner">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Bot size={14} className="text-warmchats-primary" />
+                
+                <div className="border border-warmchats-primary-light p-3 md:p-5 rounded-lg bg-warmchats-primary-light bg-opacity-10 shadow-inner">
+                  <div className="flex items-center gap-2 mb-2 md:mb-3">
+                    <Bot size={14} className="text-warmchats-primary md:w-4 md:h-4" />
                     <span className="text-xs font-medium text-warmchats-primary">AI-Generated Response</span>
-                    <Sparkles size={14} className="text-warmchats-flame ml-auto" />
+                    <div className="ml-auto">
+                      <Sparkles size={14} className="text-warmchats-flame md:w-4 md:h-4" />
+                    </div>
                   </div>
                   <p className="text-xs md:text-sm leading-relaxed">
-                    Hi Sarah,<br /><br />
-                    I just read your insightful article on growth marketing strategies for SaaS startups...
+                    Hi Sarah,<br/><br/>
+                    I just read your insightful article on growth marketing strategies for SaaS startups. Your point about community-led acquisition really resonated with me.<br/><br/>
+                    I thought you might be interested in our tool that helps marketing teams scale personalized outreach while maintaining that authentic touch you emphasized.<br/><br/>
+                    Would you be open to a quick chat about how it might complement your growth strategies?<br/><br/>
+                    Best,<br/>
+                    Alex
                   </p>
                 </div>
-
-                <div className="mt-4 flex justify-between items-center">
-                  <button className="flex items-center gap-1 px-3 py-2 text-xs text-warmchats-primary font-medium hover:bg-warmchats-primary-light hover:bg-opacity-20 rounded-lg transition-all">
-                    <Bot size={14} />
+                
+                <div className="mt-4 md:mt-6 flex justify-between items-center">
+                  <button className="flex items-center gap-1 md:gap-2 px-3 md:px-4 py-2 text-xs md:text-sm text-warmchats-primary font-medium hover:bg-warmchats-primary-light hover:bg-opacity-20 rounded-lg transition-all duration-300">
+                    <Bot size={14} className="md:w-4 md:h-4" />
                     Regenerate
                   </button>
-                  <button className="flex items-center gap-1 px-3 py-2 text-xs text-white font-medium bg-warmchats-primary rounded-lg hover:bg-warmchats-primary-dark transition-all">
-                    <ArrowRight size={14} />
+                  <button className="flex items-center gap-1 md:gap-2 px-3 md:px-4 py-2 text-xs md:text-sm text-white font-medium bg-warmchats-primary rounded-lg hover:bg-warmchats-primary-dark transition-all duration-300">
+                    <ArrowRight size={14} className="md:w-4 md:h-4" />
                     Copy & Send
                   </button>
                 </div>
               </div>
+            </div>
+            
+            {/* Interactive elements */}
+            <div className="absolute -top-4 md:-top-6 -right-4 md:-right-6 h-16 md:h-20 w-16 md:w-20 bg-warmchats-flame-light rounded-full flex items-center justify-center animate-float z-10">
+              <Flame size={24} className="text-warmchats-flame md:w-8 md:h-8" />
+            </div>
+            
+            <div className="absolute -bottom-2 md:-bottom-3 -left-2 md:-left-3 h-10 md:h-12 w-10 md:w-12 bg-warmchats-primary-light rounded-full flex items-center justify-center animate-float animation-delay-1000 z-10">
+              <Bot size={16} className="text-warmchats-primary md:w-5 md:h-5" />
             </div>
           </div>
 
