@@ -61,14 +61,16 @@ const Navbar: React.FC = () => {
               <a href="#process" onClick={(e) => scrollToSection('process', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white">
                 Process
               </a>
-              <a href="#how-it-works" onClick={(e) => scrollToSection('how-it-works', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white">
+              
+              <a href="#features" onClick={(e) => scrollToSection('features', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white">
+                Features  
+              </a>
+               <a href="#how-it-works" onClick={(e) => scrollToSection('how-it-works', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white">
                 How It Works
               </a>
+               
               <a href="#benefits" onClick={(e) => scrollToSection('benefits', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white">
                 Benefits
-              </a>
-              <a href="#features" onClick={(e) => scrollToSection('features', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white">
-                Features
               </a>
               <a href="#waitlist" onClick={(e) => scrollToSection('waitlist', e)} className="ml-0.5 px-5 py-2 text-sm bg-gradient-to-r from-warmchats-primary to-warmchats-flame text-white rounded-full hover:shadow-md transition-all hover:scale-105">
                 Join Waitlist

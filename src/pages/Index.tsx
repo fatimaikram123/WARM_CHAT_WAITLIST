@@ -44,13 +44,14 @@ const Index: React.FC = () => {
       {/* <Sidebar/> */}
       <main>
         <Hero />
+        <WaitlistCTA />
         <ProcessVisualization />
         <HowItWorks />
         <Benefits />
         <Features />
         <ComparisonTable />
         <Testimonials />
-        <WaitlistCTA />
+       
       </main>
       <Footer />
     </div>

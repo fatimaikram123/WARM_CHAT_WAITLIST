@@ -10,6 +10,8 @@ const WaitlistCTA: React.FC = () => {
     "Special launch pricing for early adopters",
     "Input into future feature development"
   ];
+ 
+
   
   return (
     <section id="waitlist" className="section-padding gradient-bg relative overflow-hidden">
