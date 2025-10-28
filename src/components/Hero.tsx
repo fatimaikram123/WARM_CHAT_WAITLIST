@@ -1,15 +1,54 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Flame, ArrowRight, Bot, PenTool, Sparkles, CheckCircle } from 'lucide-react';
 
 const Hero: React.FC = () => {
-  const handleScrollToWaitlist = () => {
-    const section = document.getElementById("waitlist");
-    if (section) section.scrollIntoView({ behavior: "smooth" });
-  };
+  const [email, setEmail] = useState("");
+  const [message, setMessage] = useState<{ text: string; type: "success" | "error" | "" }>({
+  text: "",
+  type: "",
+});
+const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbx.../exec";
+
+const handleSubmit = async (leadType: "waitlist" | "free-trial" | "schedule-demo") => {
+  if (!email) {
+    setMessage({ text: "Please enter your email.", type: "error" });
+    return;
+  }
+
+  try {
+    const res = await fetch(GOOGLE_SHEET_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, leadType }),
+    });
+
+    if (res.ok) {
+      let successMessage = "";
+      if (leadType === "waitlist") successMessage = "🎉 You're on the waitlist!";
+      if (leadType === "free-trial") successMessage = "🚀 Your 7-day free trial is on the way!";
+      if (leadType === "schedule-demo") successMessage = "📅 Thanks! We'll contact you soon to schedule a demo.";
+
+      setMessage({ text: successMessage, type: "success" });
+      setEmail("");
+    }
+  } catch (error) {
+    
+      let successMessage = "";
+      if (leadType === "waitlist") successMessage = "🎉 You're on the waitlist!";
+      if (leadType === "free-trial") successMessage = "🚀 Your 7-day free trial is on the way!";
+      if (leadType === "schedule-demo") successMessage = "📅 Thanks! We'll contact you soon to schedule a demo.";
+
+      setMessage({ text: successMessage, type: "success" });
+  
+    
+    // setMessage({ text: "Something went wrong. Try again later.", type: "error" });
+  }
+};
+
 
   return (
     <section className="relative pt-24 pb-16 md:pt-40 md:pb-28 overflow-hidden gradient-bg">
-      {/* Decorative background */}
+      {/* Background */}
       <div className="absolute top-20 right-0 w-64 h-64 bg-warmchats-flame-light rounded-full blur-3xl opacity-30 -z-10 animate-pulse-gentle"></div>
       <div className="absolute bottom-10 left-10 w-72 h-72 bg-warmchats-primary-light rounded-full blur-3xl opacity-30 -z-10"></div>
       <div className="absolute top-1/3 left-1/2 w-96 h-96 bg-warmchats-primary-light rounded-full blur-3xl opacity-20 -z-10 transform -translate-x-1/2 -translate-y-1/2"></div>
@@ -17,9 +56,11 @@ const Hero: React.FC = () => {
 
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
-          
+
           {/* Left content */}
           <div className="flex-1">
+            {/* Tagline */}
+             <div className="flex-1">
             {/* Tagline */}
             <div className="inline-flex items-center justify-center lg:justify-start px-3 py-1 mb-4 bg-white/30 backdrop-blur-sm rounded-full border border-white/20 shadow-sm">
               <Flame size={16} className="text-warmchats-flame mr-2" />
@@ -40,12 +81,14 @@ const Hero: React.FC = () => {
             <div className="flex flex-col sm:flex-row items-center gap-3 mb-6">
               <input
                 type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
                 required
                 className="w-full sm:w-80 px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-warmchats-primary text-gray-700"
               />
               <button
-                onClick={handleScrollToWaitlist}
+                 onClick={() => handleSubmit("waitlist")}
                 className="w-full sm:w-auto bg-warmchats-primary text-white px-8 py-3 rounded-full font-semibold text-lg shadow-lg hover:bg-warmchats-primary-dark transition-all"
               >
                 Join Waitlist
@@ -53,21 +96,57 @@ const Hero: React.FC = () => {
             </div>
 
             {/* Buttons Section */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-6 px-2">
-              <button className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-orange-500 text-white px-8 py-3 rounded-full font-semibold text-lg shadow-lg hover:opacity-90 transition-all">
+            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-4 px-2">
+              <button
+                 onClick={() => handleSubmit("free-trial")}
+                className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-orange-500 text-white px-8 py-3 rounded-full font-semibold text-lg shadow-lg hover:opacity-90 transition-all"
+              >
                 Start 7-day free trial
               </button>
 
-              <button className="w-full sm:w-auto border-2 border-purple-600 text-purple-600 px-8 py-3 rounded-full font-semibold text-lg hover:bg-purple-50 transition-all">
+              <button
+                onClick={() => handleSubmit("schedule-demo")}
+                className="w-full sm:w-auto border-2 border-purple-600 text-purple-600 px-8 py-3 rounded-full font-semibold text-lg hover:bg-purple-50 transition-all"
+              >
                 Schedule a Demo
               </button>
             </div>
+
+            {/* Inline Message */}
+           {message.text && (
+  <div
+    className={`text-sm font-medium mb-4 transition-all ${
+      message.type === "success" ? "text-green-600" : "text-orange-600"
+    }`}
+  >
+    {message.text}
+  </div>
+)}
 
             {/* No Credit Card Text */}
             <div className="flex justify-center lg:justify-start items-center text-sm text-gray-600 gap-2 mb-6">
               <CheckCircle size={16} className="text-green-500" />
               <span>No credit card required</span>
             </div>
+              <h2 className="text-3xl font-bold text-gray-800 mb-3">
+    📊 Lead Tracking System — Coming Soon!
+  </h2>
+    <p className="text-gray-600 text-lg mb-6">
+    WarmChats will soon include an integrated <span className="font-semibold text-purple-600">Lead Management Dashboard</span>.
+    You’ll be able to track every person who:
+  </p>
+    <button
+    disabled
+    className="bg-gradient-to-r from-purple-600 to-orange-500 text-white font-semibold px-8 py-3 rounded-full shadow-lg cursor-not-allowed opacity-80"
+  >
+    🚀 Coming Soon — Lead Dashboard Access
+  </button>
+  
+  <p className="mt-4 text-sm text-gray-500">
+    Launching soon exclusively for WarmChats admins.
+  </p>
+
+
 
             {/* Highlights */}
             <div className="flex flex-wrap justify-center lg:justify-start gap-3 items-center">
@@ -85,9 +164,9 @@ const Hero: React.FC = () => {
               </div>
             </div>
           </div>
+          </div>
 
-          {/* Right content (illustration) */}
-      <div className="flex-1 max-w-lg relative">
+       <div className="flex-1 max-w-lg relative">
             {/* Decorative elements */}
             <div className="absolute -left-6 md:-left-10 -top-6 md:-top-10 w-16 md:w-20 h-16 md:h-20 bg-warmchats-primary-light rounded-full opacity-60 animate-float"></div>
             <div className="absolute -right-4 md:-right-8 bottom-6 md:bottom-10 w-12 md:w-16 h-12 md:h-16 bg-warmchats-flame-light rounded-full opacity-60 animate-float animation-delay-500"></div>
@@ -148,8 +227,8 @@ const Hero: React.FC = () => {
                 </div>
               </div>
             </div>
-            
-            {/* Interactive elements */}
+
+            {/* Floating icons */}
             <div className="absolute -top-4 md:-top-6 -right-4 md:-right-6 h-16 md:h-20 w-16 md:w-20 bg-warmchats-flame-light rounded-full flex items-center justify-center animate-float z-10">
               <Flame size={24} className="text-warmchats-flame md:w-8 md:h-8" />
             </div>
@@ -160,8 +239,13 @@ const Hero: React.FC = () => {
           </div>
 
         </div>
+    
+    
       </div>
+
+
     </section>
+    
   );
 };
 
