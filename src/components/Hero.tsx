@@ -44,6 +44,10 @@ const handleSubmit = async (leadType: "waitlist" | "free-trial" | "schedule-demo
     // setMessage({ text: "Something went wrong. Try again later.", type: "error" });
   }
 };
+  const handleScrollToWaitlist = () => {
+    const section = document.getElementById("waitlist");
+    if (section) section.scrollIntoView({ behavior: "smooth" });
+  };
 
 
   return (
@@ -88,7 +92,12 @@ const handleSubmit = async (leadType: "waitlist" | "free-trial" | "schedule-demo
                 className="w-full sm:w-80 px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-warmchats-primary text-gray-700"
               />
               <button
-                 onClick={() => handleSubmit("waitlist")}
+                 onClick={() =>{
+                  handleSubmit("waitlist");
+                  handleScrollToWaitlist('waitlist');
+                 }
+                  
+                 }
                 className="w-full sm:w-auto bg-warmchats-primary text-white px-8 py-3 rounded-full font-semibold text-lg shadow-lg hover:bg-warmchats-primary-dark transition-all"
               >
                 Join Waitlist
@@ -98,7 +107,9 @@ const handleSubmit = async (leadType: "waitlist" | "free-trial" | "schedule-demo
             {/* Buttons Section */}
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-4 px-2">
               <button
-                 onClick={() => handleSubmit("free-trial")}
+                 onClick={() =>  
+                  
+                  handleSubmit("free-trial")}
                 className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-orange-500 text-white px-8 py-3 rounded-full font-semibold text-lg shadow-lg hover:opacity-90 transition-all"
               >
                 Start 7-day free trial
@@ -131,9 +142,9 @@ const handleSubmit = async (leadType: "waitlist" | "free-trial" | "schedule-demo
               <h2 className="text-3xl font-bold text-gray-800 mb-3">
     📊 Lead Tracking System — Coming Soon!
   </h2>
-    <p className="text-gray-600 text-lg mb-6">
-    WarmChats will soon include an integrated <span className="font-semibold text-purple-600">Lead Management Dashboard</span>.
-    You’ll be able to track every person who:
+    <p className="text-gray-600 mb-8">
+    All these leads will be securely stored in your <span className="font-medium text-purple-600">WarmChats Dashboard</span>
+    and synced with your <span className="font-medium text-orange-500">Google Sheets</span> for easy access.
   </p>
     <button
     disabled
