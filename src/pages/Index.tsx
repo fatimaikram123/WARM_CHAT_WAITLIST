@@ -12,6 +12,8 @@ import WaitlistCTA from '../components/WaitlistCTA';
 import Footer from '../components/Footer';
 import Sidebar from '@/components/SideBar';
 import { useNavigate } from "react-router-dom";
+import { PrinterCheck } from 'lucide-react';
+import PricingForAdmin from '../components/PricingForAdmin';
 
 const Index: React.FC = () => {
     const navigate = useNavigate();
@@ -45,6 +47,7 @@ const Index: React.FC = () => {
       <main>
         <Hero />
         <WaitlistCTA />
+         <PricingForAdmin/>
         <ProcessVisualization />
         <HowItWorks />
         <Benefits />

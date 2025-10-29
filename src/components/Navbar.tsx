@@ -58,23 +58,29 @@ const Navbar: React.FC = () => {
         <div className="hidden md:flex items-center space-x-3">
           <div className="bg-white/70 rounded-full p-1.5 backdrop-blur-sm">
             <div className="flex items-center gap-1">
-              <a href="#process" onClick={(e) => scrollToSection('process', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white">
-                Process
-              </a>
-              
-              <a href="#features" onClick={(e) => scrollToSection('features', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white">
+             
+                <a href="#features" onClick={(e) => scrollToSection('features', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white">
                 Features  
               </a>
+                  <a href="#pricing" onClick={(e) => scrollToSection('pricing', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white">
+                Pricing
+              </a>
                <a href="#how-it-works" onClick={(e) => scrollToSection('how-it-works', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white">
-                How It Works
+                Get Started
               </a>
+                <a href="#process" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all" onClick={(e) => scrollToSection('process', e)}>
+              See it's actions
+            </a>
+              
+                   
+           
+           
+            
                
-              <a href="#benefits" onClick={(e) => scrollToSection('benefits', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white">
-                Benefits
-              </a>
-              <a href="#waitlist" onClick={(e) => scrollToSection('waitlist', e)} className="ml-0.5 px-5 py-2 text-sm bg-gradient-to-r from-warmchats-primary to-warmchats-flame text-white rounded-full hover:shadow-md transition-all hover:scale-105">
+           
+              {/* <a href="#waitlist" onClick={(e) => scrollToSection('waitlist', e)} className="ml-0.5 px-5 py-2 text-sm bg-gradient-to-r from-warmchats-primary to-warmchats-flame text-white rounded-full hover:shadow-md transition-all hover:scale-105">
                 Join Waitlist
-              </a>
+              </a> */}
             </div>
           </div>
 
@@ -100,21 +106,23 @@ const Navbar: React.FC = () => {
       {mobileMenuOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
           <div className="p-2 flex flex-col gap-1">
-            <a href="#process" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all" onClick={(e) => scrollToSection('process', e)}>
-              Process
-            </a>
-            <a href="#how-it-works" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all" onClick={(e) => scrollToSection('how-it-works', e)}>
-              How It Works
-            </a>
-            <a href="#benefits" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all" onClick={(e) => scrollToSection('benefits', e)}>
-              Benefits
-            </a>
-            <a href="#features" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all" onClick={(e) => scrollToSection('features', e)}>
+               <a href="#features" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all" onClick={(e) => scrollToSection('features', e)}>
               Features
             </a>
+            <a href="#pricing" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all" onClick={(e) => scrollToSection('pricing', e)}>
+              Pricing
+            </a>
+            <a href="#how-it-works" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all" onClick={(e) => scrollToSection('how-it-works', e)}>
+              Get Started
+            </a>
+                  <a href="#process" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all" onClick={(e) => scrollToSection('process', e)}>
+              See it's actions
+            </a>
+          
+{/*           
             <a href="#waitlist" className="mt-1 px-4 py-2 text-sm bg-gradient-to-r from-warmchats-primary to-warmchats-flame text-white rounded-full text-center hover:shadow-md transition-all" onClick={(e) => scrollToSection('waitlist', e)}>
               Join Waitlist
-            </a>
+            </a> */}
 
             {/* ✅ Login in Mobile Menu */}
             <button

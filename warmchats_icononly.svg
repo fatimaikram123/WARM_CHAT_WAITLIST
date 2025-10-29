@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Created with Vectornator (http://vectornator.io/) -->
+<svg height="200.0pt" stroke-miterlimit="10" style="fill-rule:nonzero;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;" version="1.1" viewBox="0 0 200 200" width="200.0pt" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs/>
+<g id="Layer-1">
+<path d="M51.6534 131.067C43.1908 128.176 42.2921 118.968 40.7307 112.046C36.0446 91.2701 45.3607 67.7405 57.4578 50.7124C61.0815 45.6116 83.6419 39.1527 102.166 39.0584C124.951 38.9423 152.097 45.3523 154.698 55.2103C157.263 64.9312 147.343 66.2494 137.536 83.2735" fill="none" opacity="1" stroke="#ff6733" stroke-linecap="round" stroke-linejoin="round" stroke-width="6"/>
+<path d="M46.2736 115.5C49.2776 129.554 53.0983 143.352 80.3531 155.994C92.6713 161.708 105.776 161.471 112.784 160.195C143.614 154.58 159.758 121.662 160.466 105.318C160.755 98.6647 159.417 90.0118 155.791 86.9988C154.818 86.1899 153.747 85.5411 152.614 85.0264C143.81 81.0277 131.237 85.1213 131.237 85.1213" fill="#fccc8e" fill-rule="nonzero" opacity="1" stroke="#ff6834" stroke-linecap="round" stroke-linejoin="round" stroke-width="8"/>
+<path d="M155.791 92.3122C141.829 103.796 139.143 103.796 124.951 112.046" fill="none" opacity="1" stroke="#ff6733" stroke-linecap="round" stroke-linejoin="round" stroke-width="10"/>
+<path d="M70.665 112.625C70.665 132.816 121.391 146.868 124.951 112.046" fill="none" opacity="1" stroke="#ff6733" stroke-linecap="round" stroke-linejoin="round" stroke-width="10"/>
+<path d="M60.0382 121.426C69.5934 139.826 84.1772 145.01 92.3244 146.946C117.847 153.013 141.829 135.741 144.293 103.796" fill="none" opacity="1" stroke="#ff6733" stroke-linecap="round" stroke-linejoin="round" stroke-width="7"/>
+<path d="M50.0868 122.929C52.6883 130.732 57.6083 107.502 86.7188 113.493C103.1 116.864 106.766 119.633 118.968 128.643C119.221 128.83 116.511 116.53 123.539 96.3708C132.061 71.9241 148.612 61.2025 148.677 57.5121C148.686 57.0304 146.073 48.672 113.488 46.2393C90.7405 44.5411 86.6257 46.02 75.5332 48.3396C68.9188 49.7228 65.7786 52.3552 64.2618 53.4291C57.8234 57.9875 38.3281 87.6583 50.0868 122.929Z" fill="#ffffff" fill-rule="nonzero" opacity="1" stroke="#6735ea" stroke-linecap="round" stroke-linejoin="round" stroke-width="8"/>
+<path d="M64.5159 54.8095C64.3071 59.7959 67.5274 93.4594 67.4341 97.1753C67.2768 103.434 84.1863 74.7205 86.5191 74.473C86.8757 74.4352 89.9573 99.6411 91.0488 98.1541C111.439 70.3763 131.846 60.0646 144.293 54.8449" fill="none" opacity="1" stroke="#6735ea" stroke-linecap="round" stroke-linejoin="round" stroke-width="10"/>
+</g>
+</svg>
