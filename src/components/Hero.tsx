@@ -1,74 +1,73 @@
-import React, { useState } from 'react';
-import { Flame, ArrowRight, Bot, PenTool, Sparkles, CheckCircle } from 'lucide-react';
+import React, { useState } from "react";
+import {
+  Flame,
+  ArrowRight,
+  Bot,
+  PenTool,
+  Sparkles,
+  CheckCircle,
+} from "lucide-react";
 
 const Hero: React.FC = () => {
   const [email, setEmail] = useState("");
-  const [message, setMessage] = useState<{ text: string; type: "success" | "error" | "" }>({
-  text: "",
-  type: "",
-});
-const GOOGLE_SHEET_URL = "https://script.google.com/macros/s/AKfycbx.../exec";
+  const [submitted, setSubmitted] = useState(false);
+  const [message, setMessage] = useState<{
+    text: string;
+    type: "success" | "error" | "";
+  }>({
+    text: "",
+    type: "",
+  });
 
-const handleSubmit = async (leadType: "waitlist" | "free-trial" | "schedule-demo") => {
-  if (!email) {
-    setMessage({ text: "Please enter your email.", type: "error" });
-    return;
-  }
+  const handleSubmit = async (leadType: "waitlist" | "free-trial") => {
+    if (!email && leadType === "waitlist") {
+      setMessage({ text: "Please enter your email.", type: "error" });
+      return;
+    }
 
-  try {
-    const res = await fetch(GOOGLE_SHEET_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, leadType }),
-    });
-
-    if (res.ok) {
+    try {
+      // 🔹 Simplified — no backend call for now
       let successMessage = "";
-      if (leadType === "waitlist") successMessage = "🎉 You're on the waitlist!";
-      if (leadType === "free-trial") successMessage = "🚀 Your 7-day free trial is on the way!";
-      if (leadType === "schedule-demo") successMessage = "📅 Thanks! We'll contact you soon to schedule a demo.";
+      if (leadType === "waitlist")
+        successMessage = "🎉 You're on the waitlist!";
+      if (leadType === "free-trial")
+        successMessage = "🚀 Redirecting to signup page...";
 
       setMessage({ text: successMessage, type: "success" });
       setEmail("");
+
+      // 🔹 Redirect to signup only for trial
+      if (leadType === "free-trial") {
+        setTimeout(() => {
+          window.location.href = "/signup";
+        }, 800);
+      }
+    } catch (error) {
+      setMessage({
+        text: "Something went wrong. Try again later.",
+        type: "error",
+      });
     }
-  } catch (error) {
-    
-      let successMessage = "";
-      if (leadType === "waitlist") successMessage = "🎉 You're on the waitlist!";
-      if (leadType === "free-trial") successMessage = "🚀 Your 7-day free trial is on the way!";
-      if (leadType === "schedule-demo") successMessage = "📅 Thanks! We'll contact you soon to schedule a demo.";
-
-      setMessage({ text: successMessage, type: "success" });
-  
-    
-    // setMessage({ text: "Something went wrong. Try again later.", type: "error" });
-  }
-};
-  const handleScrollToWaitlist = () => {
-    const section = document.getElementById("waitlist");
-    if (section) section.scrollIntoView({ behavior: "smooth" });
   };
-
 
   return (
     <section className="relative pt-24 pb-16 md:pt-40 md:pb-28 overflow-hidden gradient-bg">
-      {/* Background */}
+      {/* Background blobs */}
       <div className="absolute top-20 right-0 w-64 h-64 bg-warmchats-flame-light rounded-full blur-3xl opacity-30 -z-10 animate-pulse-gentle"></div>
       <div className="absolute bottom-10 left-10 w-72 h-72 bg-warmchats-primary-light rounded-full blur-3xl opacity-30 -z-10"></div>
-      <div className="absolute top-1/3 left-1/2 w-96 h-96 bg-warmchats-primary-light rounded-full blur-3xl opacity-20 -z-10 transform -translate-x-1/2 -translate-y-1/2"></div>
-      <div className="absolute bottom-1/4 right-1/4 w-48 h-48 bg-warmchats-flame-light rounded-full blur-3xl opacity-20 -z-10 animate-pulse-gentle animation-delay-500"></div>
 
       <div className="container mx-auto px-4 md:px-6">
         <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
-
           {/* Left content */}
           <div className="flex-1">
-            {/* Tagline */}
-             <div className="flex-1">
-            {/* Tagline */}
             <div className="inline-flex items-center justify-center lg:justify-start px-3 py-1 mb-4 bg-white/30 backdrop-blur-sm rounded-full border border-white/20 shadow-sm">
-              <Flame size={16} className="text-warmchats-flame mr-2" />
-              <span className="text-xs md:text-sm font-semibold">AI-Powered Outreach Platform</span>
+              <Flame
+                size={16}
+                className="text-warmchats-flame mr-2"
+              />
+              <span className="text-xs md:text-sm font-semibold">
+                AI-Powered Outreach Platform
+              </span>
             </div>
 
             {/* Title */}
@@ -78,7 +77,9 @@ const handleSubmit = async (leadType: "waitlist" | "free-trial" | "schedule-demo
 
             {/* Description */}
             <p className="text-lg md:text-xl text-gray-700 mb-6 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-              Our AI-powered platform helps you send hyper-personalized messages in seconds across multiple channels — increasing your response rates by 300%.
+              Our AI-powered platform helps you send hyper-personalized messages
+              in seconds across multiple channels — increasing your response
+              rates by 300%.
             </p>
 
             {/* Email Input */}
@@ -92,12 +93,7 @@ const handleSubmit = async (leadType: "waitlist" | "free-trial" | "schedule-demo
                 className="w-full sm:w-80 px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-warmchats-primary text-gray-700"
               />
               <button
-                 onClick={() =>{
-                  handleSubmit("waitlist");
-                  handleScrollToWaitlist('waitlist');
-                 }
-                  
-                 }
+                onClick={() => handleSubmit("waitlist")}
                 className="w-full sm:w-auto bg-warmchats-primary text-white px-8 py-3 rounded-full font-semibold text-lg shadow-lg hover:bg-warmchats-primary-dark transition-all"
               >
                 Join Waitlist
@@ -106,79 +102,48 @@ const handleSubmit = async (leadType: "waitlist" | "free-trial" | "schedule-demo
 
             {/* Buttons Section */}
             <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 mb-4 px-2">
+              {/* 🔹 Free Trial → Redirect to signup */}
               <button
-                 onClick={() =>  
-                  
-                  handleSubmit("free-trial")}
+                onClick={() => handleSubmit("free-trial")}
                 className="w-full sm:w-auto bg-gradient-to-r from-purple-600 to-orange-500 text-white px-8 py-3 rounded-full font-semibold text-lg shadow-lg hover:opacity-90 transition-all"
               >
                 Start 7-day free trial
               </button>
 
-              <button
-                onClick={() => handleSubmit("schedule-demo")}
-                className="w-full sm:w-auto border-2 border-purple-600 text-purple-600 px-8 py-3 rounded-full font-semibold text-lg hover:bg-purple-50 transition-all"
+              {/* 🔹 Schedule Demo → Calendly link */}
+              <a
+                href={import.meta.env.VITE_CALENDLY_LINK}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full sm:w-auto border-2 border-purple-600 text-purple-600 px-8 py-3 rounded-full font-semibold text-lg hover:bg-purple-50 transition-all text-center"
               >
                 Schedule a Demo
-              </button>
+              </a>
             </div>
 
             {/* Inline Message */}
-           {message.text && (
-  <div
-    className={`text-sm font-medium mb-4 transition-all ${
-      message.type === "success" ? "text-green-600" : "text-orange-600"
-    }`}
-  >
-    {message.text}
-  </div>
-)}
+            {message.text && (
+              <div
+                className={`text-sm font-medium mb-4 transition-all ${
+                  message.type === "success"
+                    ? "text-green-600"
+                    : "text-orange-600"
+                }`}
+              >
+                {message.text}
+              </div>
+            )}
 
             {/* No Credit Card Text */}
             <div className="flex justify-center lg:justify-start items-center text-sm text-gray-600 gap-2 mb-6">
               <CheckCircle size={16} className="text-green-500" />
               <span>No credit card required</span>
             </div>
-              <h2 className="text-3xl font-bold text-gray-800 mb-3">
-    📊 Lead Tracking System — Coming Soon!
-  </h2>
-    <p className="text-gray-600 mb-8">
-    All these leads will be securely stored in your <span className="font-medium text-purple-600">WarmChats Dashboard</span>
-    and synced with your <span className="font-medium text-orange-500">Google Sheets</span> for easy access.
-  </p>
-    <button
-    disabled
-    className="bg-gradient-to-r from-purple-600 to-orange-500 text-white font-semibold px-8 py-3 rounded-full shadow-lg cursor-not-allowed opacity-80"
-  >
-    🚀 Coming Soon — Lead Dashboard Access
-  </button>
-  
-  <p className="mt-4 text-sm text-gray-500">
-    Launching soon exclusively for WarmChats admins.
-  </p>
-
-
-
-            {/* Highlights */}
-            <div className="flex flex-wrap justify-center lg:justify-start gap-3 items-center">
-              <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm">
-                <Flame size={14} className="text-warmchats-flame" />
-                <span className="text-xs md:text-sm text-gray-700 font-medium">Early access launching soon</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm">
-                <Bot size={14} className="text-warmchats-primary" />
-                <span className="text-xs md:text-sm text-gray-700 font-medium">AI-powered messaging</span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/50 backdrop-blur-sm rounded-full px-3 py-1.5 shadow-sm">
-                <PenTool size={14} className="text-warmchats-flame" />
-                <span className="text-xs md:text-sm text-gray-700 font-medium">Deeply personalized</span>
-              </div>
-            </div>
-          </div>
           </div>
 
-       <div className="flex-1 max-w-lg relative">
-            {/* Decorative elements */}
+          {/* Right section with chat preview — unchanged */}
+          <div className="flex-1 max-w-lg relative">
+                    {/* Decorative elements */}
             <div className="absolute -left-6 md:-left-10 -top-6 md:-top-10 w-16 md:w-20 h-16 md:h-20 bg-warmchats-primary-light rounded-full opacity-60 animate-float"></div>
             <div className="absolute -right-4 md:-right-8 bottom-6 md:bottom-10 w-12 md:w-16 h-12 md:h-16 bg-warmchats-flame-light rounded-full opacity-60 animate-float animation-delay-500"></div>
             
@@ -250,13 +215,10 @@ const handleSubmit = async (leadType: "waitlist" | "free-trial" | "schedule-demo
           </div>
 
         </div>
+          </div>
+      
     
-    
-      </div>
-
-
     </section>
-    
   );
 };
 
