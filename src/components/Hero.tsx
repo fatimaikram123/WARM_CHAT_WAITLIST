@@ -132,6 +132,10 @@ const Hero: React.FC = () => {
 
               {/* 🔹 Schedule Demo → Calendly link */}
               <a
+                onClick={() => {handleSubmit("demo");
+                
+                }
+                }
                 href={import.meta.env.VITE_CALENDLY_LINK}
                 target="_blank"
                 rel="noopener noreferrer"
