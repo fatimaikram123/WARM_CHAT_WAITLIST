@@ -55,9 +55,7 @@ const Hero: React.FC = () => {
       body: JSON.stringify(data)
     }
   );
-
-  alert('Lead added successfully!');
-      setMessage({text: "✅ Lead saved successfully!", type: "success" });
+      // setMessage({text: "✅ Lead saved successfully!", type: "success" });
       setEmail("");
 
       // 🔹 Redirect to signup only for trial
