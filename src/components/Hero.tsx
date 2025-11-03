@@ -13,6 +13,7 @@ const Hero: React.FC = () => {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
    const navigate = useNavigate();
+   const scriptURL = "https://script.google.com/macros/s/AKfycbw3AHIRmysna26_LC3DUX4mIeXBThrNXZttuQccmeAkGRovVhyTUBwpEucQzLvssaku/exec";
   const [message, setMessage] = useState<{
     text: string;
     type: "success" | "error" | "";
@@ -36,6 +37,27 @@ const Hero: React.FC = () => {
         successMessage = "🚀 Redirecting to signup page...";
 
       setMessage({ text: successMessage, type: "success" });
+   const data = {
+   
+    email: email,
+    Lead: leadType
+
+  };
+
+  const response = await fetch(
+    scriptURL,
+    {
+      method: 'POST',
+      mode: 'no-cors', // Important: bypass CORS enforcement
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    }
+  );
+
+  alert('Lead added successfully!');
+      setMessage({text: "✅ Lead saved successfully!", type: "success" });
       setEmail("");
 
       // 🔹 Redirect to signup only for trial
