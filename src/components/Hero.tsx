@@ -40,9 +40,7 @@ const Hero: React.FC = () => {
 
       // 🔹 Redirect to signup only for trial
       if (leadType === "free-trial") {
-        setTimeout(() => {
           navigate("/signup");
-        }, 800);
       }
     } catch (error) {
       setMessage({
