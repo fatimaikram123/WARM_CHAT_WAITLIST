@@ -7,10 +7,12 @@ import {
   Sparkles,
   CheckCircle,
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Hero: React.FC = () => {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
+   const navigate = useNavigate();
   const [message, setMessage] = useState<{
     text: string;
     type: "success" | "error" | "";
@@ -39,7 +41,7 @@ const Hero: React.FC = () => {
       // 🔹 Redirect to signup only for trial
       if (leadType === "free-trial") {
         setTimeout(() => {
-          window.location.href = "/signup";
+          navigate("/signup");
         }, 800);
       }
     } catch (error) {
