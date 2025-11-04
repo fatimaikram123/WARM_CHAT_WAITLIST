@@ -82,7 +82,7 @@ const Features: React.FC = () => {
               <p className="text-white text-opacity-90 mb-4 md:mb-6 text-sm md:text-base">
                 Our advanced AI understands context, tone, and purpose to create messages that sound authentically human and drive meaningful conversations.
               </p>
-              <a href="#waitlist" className="inline-block bg-white text-warmchats-primary font-semibold px-4 md:px-6 py-2 md:py-3 rounded-full hover:shadow-lg transition-all transform hover:scale-105 text-sm md:text-base">
+              <a href="/signup" className="inline-block bg-white text-warmchats-primary font-semibold px-4 md:px-6 py-2 md:py-3 rounded-full hover:shadow-lg transition-all transform hover:scale-105 text-sm md:text-base">
                 Try It Now
               </a>
             </div>

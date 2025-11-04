@@ -172,7 +172,7 @@ const ComparisonTable: React.FC = () => {
           
           <div className="mt-8 text-center">
             <p className="text-gray-600 mb-4">Experience the WarmChats advantage today</p>
-            <a href="#waitlist" className="btn-primary inline-block">Join Our Waitlist</a>
+            <a href="/signup" className="btn-primary inline-block">Join Our Waitlist</a>
           </div>
         </div>
       </div>

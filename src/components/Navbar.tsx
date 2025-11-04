@@ -65,7 +65,7 @@ const Navbar: React.FC = () => {
                   <a href="#pricing" onClick={(e) => scrollToSection('pricing', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white">
                 Pricing
               </a>
-               <a href="#how-it-works" onClick={(e) => scrollToSection('how-it-works', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white">
+               <a href="#how-it-works" onClick={(e) => scrollToSection('hero', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white">
                 Get Started
               </a>
                 <a href="#process" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all" onClick={(e) => scrollToSection('process', e)}>

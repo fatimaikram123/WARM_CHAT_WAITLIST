@@ -49,7 +49,7 @@ const Index: React.FC = () => {
         {/* <WaitlistCTA /> */}
          <PricingForAdmin/>
         <ProcessVisualization />
-        <HowItWorks />
+        {/* <HowItWorks /> */}
         <Benefits />
         <Features />
         <ComparisonTable />

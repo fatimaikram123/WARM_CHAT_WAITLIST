@@ -37,6 +37,7 @@ const Hero: React.FC = () => {
         successMessage = "🚀 Redirecting to signup page...";
 
       setMessage({ text: successMessage, type: "success" });
+
    const data = {
    
     email: email,
@@ -62,6 +63,9 @@ const Hero: React.FC = () => {
       if (leadType === "free-trial") {
           navigate("/signup");
       }
+       if (leadType === "waitlist"){
+        navigate("/signup");
+       }
     } catch (error) {
       setMessage({
         text: "Something went wrong. Try again later.",
@@ -71,7 +75,7 @@ const Hero: React.FC = () => {
   };
 
   return (
-    <section className="relative pt-24 pb-16 md:pt-40 md:pb-28 overflow-hidden gradient-bg">
+    <section  id="hero"className="relative pt-24 pb-16 md:pt-40 md:pb-28 overflow-hidden gradient-bg">
       {/* Background blobs */}
       <div className="absolute top-20 right-0 w-64 h-64 bg-warmchats-flame-light rounded-full blur-3xl opacity-30 -z-10 animate-pulse-gentle"></div>
       <div className="absolute bottom-10 left-10 w-72 h-72 bg-warmchats-primary-light rounded-full blur-3xl opacity-30 -z-10"></div>
@@ -112,12 +116,13 @@ const Hero: React.FC = () => {
                 required
                 className="w-full sm:w-80 px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-warmchats-primary text-gray-700"
               />
-              <button
+              <a
+                 href="/signup"
                 onClick={() => handleSubmit("waitlist")}
                 className="w-full sm:w-auto bg-warmchats-primary text-white px-8 py-3 rounded-full font-semibold text-lg shadow-lg hover:bg-warmchats-primary-dark transition-all"
               >
                 Join Waitlist
-              </button>
+              </a>
             </div>
 
             {/* Buttons Section */}
@@ -132,10 +137,10 @@ const Hero: React.FC = () => {
 
               {/* 🔹 Schedule Demo → Calendly link */}
               <a
-                onClick={() => {handleSubmit("demo");
+                onClick={() => handleSubmit("demo")}
                 
-                }
-                }
+                
+                
                 href={import.meta.env.VITE_CALENDLY_LINK}
                 target="_blank"
                 rel="noopener noreferrer"
