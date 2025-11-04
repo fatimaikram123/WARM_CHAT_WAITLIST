@@ -1,8 +1,9 @@
 
 import React from 'react';
 import { Layers, FileText, PieChart, Sparkles, Puzzle, Shield } from 'lucide-react';
-
+import { useNavigate } from 'react-router-dom';
 const Features: React.FC = () => {
+   const navigate = useNavigate();
   const features = [
     {
       icon: <Layers size={28} className="text-warmchats-primary" />,
@@ -82,7 +83,7 @@ const Features: React.FC = () => {
               <p className="text-white text-opacity-90 mb-4 md:mb-6 text-sm md:text-base">
                 Our advanced AI understands context, tone, and purpose to create messages that sound authentically human and drive meaningful conversations.
               </p>
-              <a href="/signup" className="inline-block bg-white text-warmchats-primary font-semibold px-4 md:px-6 py-2 md:py-3 rounded-full hover:shadow-lg transition-all transform hover:scale-105 text-sm md:text-base">
+              <a onClick={()=>{navigate("/signup")}} className="inline-block bg-white text-warmchats-primary font-semibold px-4 md:px-6 py-2 md:py-3 rounded-full hover:shadow-lg transition-all transform hover:scale-105 text-sm md:text-base">
                 Try It Now
               </a>
             </div>
