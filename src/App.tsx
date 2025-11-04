@@ -44,7 +44,6 @@ const App = () => (
         <Route path="/leads" element={<Leads />} />
         <Route path="/inbox" element={<Inbox />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
           <Route path="/followups" element={<FollowUps />} />
         <Route path="/ai-writer" element={<AIWriter />} />
            <Route path="/integrations/hubspot" element={<HubSpotIntegration />} />
@@ -56,8 +55,6 @@ const App = () => (
         <Route path="/inbox/new" element={<NewMessage />} />
         <Route path="pricing" element={<Pricing/>}/>
          <Route path="/waitlist" element={<Waitlist />} />
-
-
          
 
         </Routes>
