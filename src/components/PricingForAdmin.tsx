@@ -106,9 +106,9 @@ export default function PrisingForAdmin() {
 
         <div className="mt-16 text-center">
           <p className="text-gray-700 mb-4">Interested in bigger plans or custom features?</p>
-          <button className="px-6 py-3 border border-orange-500 text-orange-600 rounded-lg font-medium hover:bg-orange-50 transition">
+          <a target="_blank" href={import.meta.env.VITE_CALENDLY_LINK}  className="px-6 py-3 border border-orange-500 text-orange-600 rounded-lg font-medium hover:bg-orange-50 transition">
             Let’s Connect
-          </button>
+          </a>
         </div>
       </section>
         );
