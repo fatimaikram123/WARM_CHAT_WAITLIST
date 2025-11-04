@@ -3,9 +3,11 @@ import React from 'react';
 import { Check, X, Lightbulb, Zap, Bot, Layers, BarChart, CircleDollarSign, Puzzle } from 'lucide-react';
 import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table";
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useNavigate } from 'react-router-dom';
 
 const ComparisonTable: React.FC = () => {
   const isMobile = useIsMobile();
+  const navigate = useNavigate();
   
   const comparisons = [
     {
@@ -172,7 +174,7 @@ const ComparisonTable: React.FC = () => {
           
           <div className="mt-8 text-center">
             <p className="text-gray-600 mb-4">Experience the WarmChats advantage today</p>
-            <a href="/signup" className="btn-primary inline-block">Join Our Waitlist</a>
+            <a     onClick={() => navigate("/signup")} className="btn-primary inline-block">Join Our Waitlist</a>
           </div>
         </div>
       </div>

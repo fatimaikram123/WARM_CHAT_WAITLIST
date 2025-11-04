@@ -27,6 +27,7 @@ const Hero: React.FC = () => {
       setMessage({ text: "Please enter your email.", type: "error" });
       return;
     }
+    
 
     try {
       // 🔹 Simplified — no backend call for now
@@ -63,9 +64,10 @@ const Hero: React.FC = () => {
       if (leadType === "free-trial") {
           navigate("/signup");
       }
-       if (leadType === "waitlist"){
+        if (leadType === "waitlist"){
         navigate("/signup");
        }
+      
     } catch (error) {
       setMessage({
         text: "Something went wrong. Try again later.",
@@ -117,7 +119,6 @@ const Hero: React.FC = () => {
                 className="w-full sm:w-80 px-4 py-3 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-warmchats-primary text-gray-700"
               />
               <a
-                 href="/signup"
                 onClick={() => handleSubmit("waitlist")}
                 className="w-full sm:w-auto bg-warmchats-primary text-white px-8 py-3 rounded-full font-semibold text-lg shadow-lg hover:bg-warmchats-primary-dark transition-all"
               >
