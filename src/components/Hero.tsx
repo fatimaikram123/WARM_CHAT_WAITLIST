@@ -137,7 +137,7 @@ const Hero: React.FC = () => {
               </button>
 
               {/* 🔹 Schedule Demo → Calendly link */}
-              <a
+              {/* <a
                 onClick={() => handleSubmit("demo")}
                 
                 
@@ -148,7 +148,7 @@ const Hero: React.FC = () => {
                 className="w-full sm:w-auto border-2 border-purple-600 text-purple-600 px-8 py-3 rounded-full font-semibold text-lg hover:bg-purple-50 transition-all text-center"
               >
                 Schedule a Demo
-              </a>
+              </a> */}
             </div>
 
             {/* Inline Message */}

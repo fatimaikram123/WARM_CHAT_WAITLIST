@@ -21,7 +21,7 @@ const Footer: React.FC = () => {
             <div>
               <h3 className="font-semibold mb-2 md:mb-3 text-sm md:text-base">Product</h3>
               <ul className="space-y-1 md:space-y-2 text-xs md:text-sm">
-                <li><a href="#process" className="text-gray-600 hover:text-warmchats-primary">See It's actions</a></li>
+                <li><a href="#process" className="text-gray-600 hover:text-warmchats-primary">see it in action</a></li>
                 <li><a href="#features" className="text-gray-600 hover:text-warmchats-primary">Features</a></li>
                 <li><a href="#pricing" className="text-gray-600 hover:text-warmchats-primary">Pricing</a></li>
               </ul>
