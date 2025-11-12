@@ -14,6 +14,7 @@ import Sidebar from '@/components/SideBar';
 import { useNavigate } from "react-router-dom";
 import { PrinterCheck } from 'lucide-react';
 import PricingForAdmin from '../components/PricingForAdmin';
+import ComparisonTabs from '@/components/ComparisonTabs';
 
 const Index: React.FC = () => {
     const navigate = useNavigate();
@@ -52,6 +53,7 @@ const Index: React.FC = () => {
         {/* <HowItWorks /> */}
         <Benefits />
         <Features />
+        <ComparisonTabs/>
         <ComparisonTable />
         <Testimonials />
        
