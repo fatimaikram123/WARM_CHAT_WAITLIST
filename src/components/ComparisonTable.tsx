@@ -64,7 +64,7 @@ const ComparisonTable: React.FC = () => {
   return (
     <section id="comparison" className="section-padding bg-white">
       <div className="container mx-auto px-4 md:px-6">
-        <h2 className="section-title">WarmChats vs Other Tools</h2>
+        <h2 className="section-title">WarmChats MailChimp</h2>
         <p className="section-subtitle">
           See how WarmChats compares to traditional outreach solutions
         </p>
