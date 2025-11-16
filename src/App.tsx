@@ -30,7 +30,7 @@ import ManageUsers from "./components/ManageUsers";
 import OrganizationList from "./pages/OrganizationList";
 import CreateOrganization from "./pages/CreateOrganization";
 import UnifiedInbox from "./components/UnifiedInbox";
-import ConnectAccount from "./components/connectAccount";
+import ConnectAccount from './components/ConnectAccount'
 import ThreadView from './components/ThreadView';
 import RoleProtectedRoute from "./components/RoleProtectedRoute";
 import { ROLES } from "./constants/roles";
