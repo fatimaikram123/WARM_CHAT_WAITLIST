@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { ROLES } from "../constants/Roles";
+import {ROLES} from "../constants/roles"
 
 export default function Sidebar({ isOpen, toggleSidebar }) {
   const navigate = useNavigate();
