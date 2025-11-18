@@ -25,9 +25,14 @@ export default function Inbox() {
   const [reply, setReply] = useState("");
   const [isSyncing, setIsSyncing] = useState(false);
 
+  // ⬇️ Pagination States
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+
   const navigate = useNavigate();
 
-  // ✅ Sync emails (fetch new from IMAP)
+  // ⬇️ Sync incoming inbox
   const syncEmailsFromInbox = async () => {
     try {
       const res = await fetch(
@@ -36,47 +41,40 @@ export default function Inbox() {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
-            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone
+            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
           },
         }
       );
 
       if (!res.ok) throw new Error("Failed to fetch emails");
-
       const data = await res.json();
-      const fetched_count = data.fetched_count;
+      toast.success(`Emails synced (${data.fetched_count} new).`);
       fetchEmails();
-
-      toast.success(`Emails synced successfully (${fetched_count} new).`);
     } catch (err) {
-      console.error("❌ Error fetching inbox:", err);
-      toast.error("Failed to fetch inbox emails.");
+      console.error(err);
+      toast.error("Failed to sync inbox.");
     }
   };
 
-  // ✅ Sync button handler
   const handleSync = async () => {
     try {
       setIsSyncing(true);
       await syncEmailsFromInbox();
-    } catch (error) {
-      console.error("Sync failed:", error);
-      toast.error("Failed to sync emails.");
     } finally {
       setIsSyncing(false);
     }
   };
 
-  // ✅ Fetch stored emails
+  // ⬇️ Fetch already-stored emails with pagination
   const fetchEmails = async () => {
     try {
       const res = await fetch(
-        `${API_BASE}/api/inbox/fetch/already/${userId}`,
+        `${API_BASE}/api/inbox/fetch/already/${userId}?page=${page}&limit=${limit}`,
         {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
-             "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone
+            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
           },
         }
       );
@@ -84,45 +82,47 @@ export default function Inbox() {
       if (!res.ok) throw new Error("Failed to fetch emails");
 
       const data = await res.json();
+
+      // Set pagination
+      setTotalPages(data.pages || 1);
+
       const formatted = (data.messages || []).map((m) => ({
         id: m.id,
-        sender: m.sender || m.from || "Unknown",
+        sender: m.sender || "Unknown",
         channel: m.channel || "email",
         subject: m.subject || "(No Subject)",
-        preview: m.snippet || m.body?.slice(0, 60) || "",
-        time: new Date(m.created_at || m.date || Date.now()).toLocaleString(),
-        from: m.from,
+        preview: m.body?.slice(0, 60) || "",
+        time: new Date(m.created_at || Date.now()).toLocaleString(),
+        from: m.sender,
         thread_id: m.thread_id,
       }));
 
       setMessages(formatted);
     } catch (err) {
-      console.error("❌ Error fetching inbox:", err);
+      console.error(err);
       toast.error("Failed to load stored emails.");
     }
   };
 
-  // ✅ Fetch already stored emails on mount
+  // ⬇️ Fetch on load + when page changes
   useEffect(() => {
     if (userId && token) fetchEmails();
-  }, [userId, token, API_BASE]);
+  }, [userId, token, page]);
 
-  // ✅ Filter by tab
+  // ⬇️ Filter tabs
   const filteredMessages =
     activeTab === "All"
       ? messages
       : messages.filter((m) => {
-          if (activeTab === "Email") return m.channel?.toLowerCase() === "email";
+          if (activeTab === "Email")
+            return m.channel?.toLowerCase() === "email";
           if (activeTab === "SMS") return m.channel?.toLowerCase() === "sms";
           return true;
         });
 
-  // ✅ Send reply via API
+  // ⬇️ Send reply
   const handleSend = async () => {
-    if (!reply || !selected) {
-      toast.error("Please select a message and enter a reply.");
-      return;
-    }
+    if (!reply || !selected) return toast.error("Select a message first!");
 
     try {
       const res = await fetch(`${API_BASE}/api/inbox/send`, {
@@ -130,7 +130,7 @@ export default function Inbox() {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
-           "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone
+          "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
         },
         body: JSON.stringify({
           user_id: userId,
@@ -141,48 +141,44 @@ export default function Inbox() {
       });
 
       if (res.ok) {
-        toast.success("✅ Email sent successfully!");
+        toast.success("Email sent!");
         setReply("");
         setAiReply("");
-      } else {
-        toast.error("❌ Failed to send email.");
-      }
+      } else toast.error("Failed to send.");
     } catch (err) {
-      console.error("❌ Error sending email:", err);
       toast.error("Error while sending email.");
+      console.error(err);
     }
   };
 
-  // ✅ Generate AI Smart Reply
+  // ⬇️ AI reply (fake)
   const handleGenerateAIReply = (msg) => {
     setSelected(msg);
     setLoading(true);
     setTimeout(() => {
       setAiReply(
-        `Hey ${msg.sender.split(" ")[0]}, totally understand! 😊 Just curious — would it make sense if I share how similar teams saved 5 hrs/week automating outreach with WarmChats?`
+        `Hey ${msg.sender}, I understand! Would you like help automating your outreach?`
       );
       setLoading(false);
-      toast.success("AI smart reply generated!");
-    }, 1500);
+    }, 1200);
   };
 
   return (
     <MainLayout>
       <div className="flex flex-col md:flex-row items-center justify-between mb-6 gap-3">
-        <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
-          📬 Centralized Inbox
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-800">📬 Centralized Inbox</h1>
+
         <div className="flex gap-3">
           <button
             onClick={() => navigate("/connect-email")}
-            className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg font-medium hover:shadow-md transition flex items-center gap-2"
+            className="px-4 py-2 bg-orange-500 text-white rounded-lg"
           >
             Connect Account
           </button>
 
           <button
             onClick={() => navigate("/inbox/new")}
-            className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg font-medium hover:shadow-md transition flex items-center gap-2"
+            className="px-4 py-2 bg-orange-500 text-white rounded-lg"
           >
             <Send size={16} /> New Message
           </button>
@@ -190,25 +186,21 @@ export default function Inbox() {
           <button
             onClick={handleSync}
             disabled={isSyncing}
-            className={`px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg font-medium hover:shadow-md transition flex items-center gap-2 ${
-              isSyncing ? "opacity-80 cursor-not-allowed" : ""
-            }`}
+            className="px-4 py-2 bg-orange-500 text-white rounded-lg flex items-center gap-2"
           >
             {isSyncing ? (
               <>
-                <RotateCw size={18} className="animate-spin" />
-                Syncing...
+                <RotateCw className="animate-spin" /> Syncing…
               </>
             ) : (
               <>
-                <RotateCw size={18} />
-                Sync Email
+                <RotateCw /> Sync Email
               </>
             )}
           </button>
         </div>
 
-        <Toaster position="top-right" reverseOrder={false} />
+        <Toaster position="top-right" />
       </div>
 
       {/* Tabs */}
@@ -217,10 +209,10 @@ export default function Inbox() {
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 font-medium border-b-2 transition ${
+            className={`px-4 py-2 font-medium border-b-2 ${
               activeTab === tab
                 ? "border-orange-500 text-orange-600"
-                : "border-transparent text-gray-600 hover:text-orange-500"
+                : "border-transparent text-gray-600"
             }`}
           >
             {tab}
@@ -241,35 +233,13 @@ export default function Inbox() {
                   setSelected(msg);
                   navigate(`/inbox/thread/${msg.thread_id}`);
                 }}
-                className={`p-5 transition cursor-pointer
-                  ${
-                    msg.channel === "email"
-                      ? "hover:bg-pink-100"
-                      : "hover:bg-white"
-                  } 
-                  ${selected?.id === msg.id ? "bg-orange-50" : "bg-white"}
-                `}
+                className={`p-5 cursor-pointer hover:bg-orange-50`}
               >
-                <div className="flex justify-between items-start">
+                <div className="flex justify-between">
                   <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold text-gray-800">
-                        {msg.sender}
-                      </span>
-                      <span
-                        className={`text-xs px-2 py-0.5 rounded-full ${
-                          msg.channel === "email"
-                            ? "bg-blue-50 text-blue-600"
-                            : "bg-green-50 text-green-600"
-                        }`}
-                      >
-                        {msg.channel}
-                      </span>
-                    </div>
+                    <div className="font-semibold">{msg.sender}</div>
                     <div className="text-sm text-gray-700">{msg.subject}</div>
-                    <div className="text-xs text-gray-500 mt-1">
-                      {msg.preview}
-                    </div>
+                    <div className="text-xs text-gray-500">{msg.preview}</div>
                   </div>
                   <div className="text-xs text-gray-500">{msg.time}</div>
                 </div>
@@ -279,35 +249,61 @@ export default function Inbox() {
         )}
       </div>
 
-      {/* AI Reply Section */}
+      {/* Pagination */}
+      <div className="flex items-center justify-center mt-4 gap-4">
+        <button
+          disabled={page === 1}
+          onClick={() => setPage(page - 1)}
+          className="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50"
+        >
+          Previous
+        </button>
+
+        <span className="text-gray-600">
+          Page {page} of {totalPages}
+        </span>
+
+        <button
+          disabled={page === totalPages}
+          onClick={() => setPage(page + 1)}
+          className="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50"
+        >
+          Next
+        </button>
+      </div>
+
+      {/* AI reply box */}
       {loading && (
-        <div className="mt-6 bg-white p-4 rounded-xl border border-orange-100 text-center text-gray-600">
+        <div className="mt-6 bg-white p-4 rounded-xl border text-center text-gray-600">
           <Loader2 className="animate-spin w-5 h-5 inline-block mr-2" />
-          Generating AI reply suggestion...
+          Generating AI reply…
         </div>
       )}
 
       {aiReply && !loading && (
-        <div className="mt-6 bg-white p-6 rounded-2xl border border-orange-200 shadow-sm">
-          <h3 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-            <Sparkles className="text-orange-500 w-5 h-5" /> AI Smart Reply
+        <div className="mt-6 bg-white p-6 rounded-xl border shadow-sm">
+          <h3 className="text-lg font-semibold mb-2">
+            <Sparkles className="inline w-5 h-5 text-orange-500 mr-1" />
+            AI Reply
           </h3>
+
           <textarea
-            className="w-full border border-gray-300 rounded-lg p-3 text-gray-700"
+            className="w-full border rounded-lg p-3"
             rows={4}
             value={reply || aiReply}
             onChange={(e) => setReply(e.target.value)}
           />
+
           <div className="mt-4 flex gap-3">
             <button
               onClick={handleSend}
-              className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg text-sm font-medium flex items-center gap-2"
+              className="px-4 py-2 bg-orange-500 text-white rounded-lg"
             >
               <Send size={14} /> Send
             </button>
             <button
               onClick={() => setAiReply("")}
-              className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg text-sm hover:bg-gray-50"
+              className="px-4 py-2 border text-gray-700 rounded-lg"
             >
               Dismiss
             </button>

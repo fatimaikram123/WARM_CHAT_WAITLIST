@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import MainLayout from "../components/MainLayout";
 import { ArrowLeft, Send } from "lucide-react";
-import toast, { Toaster } from "react-hot-toast"; // <-- Import react-hot-toast
+import toast, { Toaster } from "react-hot-toast";
 
 export default function ThreadView() {
   const { thread_id } = useParams();
@@ -15,44 +15,56 @@ export default function ThreadView() {
   const [conversation, setConversation] = useState([]);
   const [reply, setReply] = useState("");
   const [toEmails, setToEmails] = useState(""); 
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const limit = 20;
+
   const user_id = localStorage.getItem("user_id");
   const org_id = localStorage.getItem("org_id");
 
-  useEffect(() => {
-    const fetchThread = async () => {
-      try {
-        const res = await fetch(`${API_BASE}/api/inbox/thread/${thread_id}/${user_id}`, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone
-          },
-        });
-        const data = await res.json();
-        if (data.success) {
-          setThread(data.thread);
+  // Fetch thread messages with pagination
+  const fetchThread = async (reset = false) => {
+    try {
+      const res = await fetch(`${API_BASE}/api/inbox/thread/${thread_id}/${user_id}?limit=${limit}&offset=${reset ? 0 : offset}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone
+        },
+      });
+      const data = await res.json();
+      if (data.success) {
+        if (reset) {
           setConversation(data.conversation || []);
-
-          // Prepopulate 'To' field with unique emails
-          const uniqueEmails = Array.from(
-            new Set([
-              ...(data.conversation || [])
-                .filter(msg => msg.direction === "inbound")
-                .map(msg => msg.sender_email?.trim())
-                .filter(email => email && email !== user_email),
-              ...(data.thread.reply_email || []).map(email => email?.trim())
-            ])
-          );
-
-          setToEmails(uniqueEmails.join(", "));
+          setThread(data.thread);
+          setOffset(data.conversation.length);
+        } else {
+          setConversation(prev => [...data.conversation, ...prev]);
+          setOffset(prev => prev + data.conversation.length);
         }
-      } catch (error) {
-        console.error("❌ Failed to load thread:", error);
-        toast.error("Failed to load thread!");
+        setHasMore(data.has_more);
+
+        // Prepopulate 'To' field with unique emails
+        const uniqueEmails = Array.from(
+          new Set([
+            ...(data.conversation || [])
+              .filter(msg => msg.direction === "inbound")
+              .map(msg => msg.sender_email?.trim())
+              .filter(email => email && email !== user_email),
+            ...(data.thread.reply_email || []).map(email => email?.trim())
+          ])
+        );
+        setToEmails(uniqueEmails.join(", "));
       }
-    };
-    fetchThread();
-  }, [thread_id, API_BASE, token, user_email]);
+    } catch (error) {
+      console.error("❌ Failed to load thread:", error);
+      toast.error("Failed to load thread!");
+    }
+  };
+
+  useEffect(() => {
+    fetchThread(true); // Fetch latest 20 on mount
+  }, [thread_id]);
 
   const handleReply = async () => {
     if (!reply.trim() || !toEmails.trim()) {
@@ -68,7 +80,7 @@ export default function ThreadView() {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
-           "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone
+          "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone
         },
         body: JSON.stringify({
           thread_id,
@@ -107,7 +119,6 @@ export default function ThreadView() {
 
   return (
     <MainLayout>
-      {/* Toast container */}
       <Toaster position="top-right" reverseOrder={false} />
 
       <button
@@ -123,14 +134,25 @@ export default function ThreadView() {
             {thread.subject}
           </h2>
 
+          {/* Load previous button */}
+          {hasMore && (
+            <div className="text-center mb-2">
+              <button
+                onClick={() => fetchThread(false)}
+                className="px-3 py-1 text-sm text-blue-600 hover:underline"
+              >
+                Load previous messages
+              </button>
+            </div>
+          )}
+
           {/* Chat layout */}
-          <div className="space-y-4">
+          <div className="space-y-4 max-h-[500px] overflow-y-auto">
             {conversation.length === 0 ? (
               <div className="text-center text-gray-400">No messages yet</div>
             ) : (
               conversation.map((msg, i) => (
                 <div key={i} data-lov-id={msg.id}>
-                
                   <div className={`flex ${msg.direction === "outbound" ? "justify-end" : "justify-start"}`}>
                     <div className={`max-w-[75%] rounded-2xl p-3 shadow-sm ${
                       msg.direction === "outbound"
@@ -141,15 +163,10 @@ export default function ThreadView() {
                         {msg.sender || (msg.direction === "outbound" ? "You" : msg.sender)}
                       </div>
 
-                      <div className="text-sm whitespace-pre-line">
-                        {msg.message}
-                      </div>
+                      <div className="text-sm whitespace-pre-line break-words">{msg.message}</div>
 
                       <div className="text-[11px] text-gray-500 mt-1 text-right">
-                        {new Date(msg.sent_time).toLocaleTimeString([], {
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        })}
+                        {new Date(msg.sent_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                       </div>
                     </div>
                   </div>
