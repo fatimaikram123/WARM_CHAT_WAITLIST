@@ -37,6 +37,7 @@ const Login: React.FC = () => {
       localStorage.setItem("org_id", JSON.stringify(data.org_id));
       localStorage.setItem("gmail_user_name", data.gmail_user_name);
       localStorage.setItem("org_name", data.org_name);
+      localStorage.setItem("gmail_email_id",data.gmail_email_id)
 
       toast.success("Logged in successfully!");
       navigate("/dashboard");

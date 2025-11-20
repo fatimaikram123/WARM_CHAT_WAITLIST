@@ -37,6 +37,11 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
     localStorage.removeItem("role_name");
     localStorage.removeItem("org_id");
     localStorage.removeItem("gmail_user_name");
+    localStorage.removeItem("gmail_email_id");
+    localStorage.removeItem("email");
+    localStorage.removeItem("org_name");
+    localStorage.removeItem("session")
+
 
     navigate("/login");
   };

@@ -36,7 +36,7 @@ export default function Inbox() {
   const syncEmailsFromInbox = async () => {
     try {
       const res = await fetch(
-        `${API_BASE}/api/inbox/fetch/${userId}/${org_id}`,
+        `${API_BASE}/api/inbox/fetch/${userId}/${org_id}?page=${page}&limit=${limit}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -48,7 +48,7 @@ export default function Inbox() {
 
       if (!res.ok) throw new Error("Failed to fetch emails");
       const data = await res.json();
-      toast.success(`Emails synced (${data.fetched_count} new).`);
+      toast.success(`Emails synced (${data.threads_checked} new).`);
       fetchEmails();
     } catch (err) {
       console.error(err);
@@ -108,6 +108,16 @@ export default function Inbox() {
   useEffect(() => {
     if (userId && token) fetchEmails();
   }, [userId, token, page]);
+  // useEffect(() => {
+  // const fetchInbox = async () => {
+  //   if (userId && token) {
+  //     await syncEmailsFromInbox();
+  //   }
+  // };
+
+//   fetchInbox();
+// }, [userId, token, page]);
+
 
   // ⬇️ Filter tabs
   const filteredMessages =

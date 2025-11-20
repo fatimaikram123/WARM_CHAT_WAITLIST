@@ -9,18 +9,31 @@ export default function ThreadView() {
   const navigate = useNavigate();
   const API_BASE = import.meta.env.VITE_API_BASE;
   const token = localStorage.getItem("token");
-  const user_email = localStorage.getItem("user_email"); 
+  const user_email = localStorage.getItem("gmail_email_id"); 
+  const gmail_user_name = localStorage.getItem("gmail_user_name");
+
+  const user_id = localStorage.getItem("user_id");
+  const org_id = localStorage.getItem("org_id");
 
   const [thread, setThread] = useState(null);
   const [conversation, setConversation] = useState([]);
   const [reply, setReply] = useState("");
-  const [toEmails, setToEmails] = useState(""); 
   const [offset, setOffset] = useState(0);
   const [hasMore, setHasMore] = useState(true);
+  const [leads, setLeads] = useState([]);
+  const [selectedLeadEmails, setSelectedLeadEmails] = useState([]);
+  const [selectedLeadIds, setSelectedLeadIds] = useState([]);
   const limit = 20;
 
-  const user_id = localStorage.getItem("user_id");
-  const org_id = localStorage.getItem("org_id");
+  // Fetch leads list for checkbox
+  useEffect(() => {
+    fetch(`${API_BASE}/api/leads/${org_id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then(res => res.json())
+      .then(data => setLeads(data || []))
+      .catch(() => console.log("Failed to load leads"));
+  }, [API_BASE, org_id, token]);
 
   // Fetch thread messages with pagination
   const fetchThread = async (reset = false) => {
@@ -43,18 +56,6 @@ export default function ThreadView() {
           setOffset(prev => prev + data.conversation.length);
         }
         setHasMore(data.has_more);
-
-        // Prepopulate 'To' field with unique emails
-        const uniqueEmails = Array.from(
-          new Set([
-            ...(data.conversation || [])
-              .filter(msg => msg.direction === "inbound")
-              .map(msg => msg.sender_email?.trim())
-              .filter(email => email && email !== user_email),
-            ...(data.thread.reply_email || []).map(email => email?.trim())
-          ])
-        );
-        setToEmails(uniqueEmails.join(", "));
       }
     } catch (error) {
       console.error("❌ Failed to load thread:", error);
@@ -66,13 +67,52 @@ export default function ThreadView() {
     fetchThread(true); // Fetch latest 20 on mount
   }, [thread_id]);
 
+  // Preselect leads based on conversation inbound emails AND thread.lead_ids
+  useEffect(() => {
+    if (!thread || leads.length === 0) return;
+
+    // Emails from inbound messages (exclude user)
+    const uniqueEmails = Array.from(
+      new Set(
+        (conversation || [])
+          .filter(msg => msg.direction === "inbound")
+          .map(msg => msg.sender_email?.trim())
+          .filter(email => email && email !== user_email)
+      )
+    );
+
+    // Lead IDs from thread.lead_ids
+    const leadIdsFromThread = thread.lead_ids || [];
+
+    const matchedLeadIds = leads
+      .filter(
+        lead =>
+          uniqueEmails.includes(lead.email) || leadIdsFromThread.includes(lead.id)
+      )
+      .map(lead => lead.id);
+
+    const matchedLeadEmails = leads
+      .filter(lead => matchedLeadIds.includes(lead.id))
+      .map(lead => lead.email);
+
+    setSelectedLeadIds(matchedLeadIds);
+    setSelectedLeadEmails(matchedLeadEmails);
+  }, [thread, conversation, leads]);
+
+  const handleLeadCheckboxChange = (email, id) => {
+    setSelectedLeadEmails(prev =>
+      prev.includes(email) ? prev.filter(e => e !== email) : [...prev, email]
+    );
+    setSelectedLeadIds(prev =>
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
   const handleReply = async () => {
-    if (!reply.trim() || !toEmails.trim()) {
-      toast.error("Please enter a message and recipient email(s)!");
+    if (!reply.trim() || selectedLeadEmails.length === 0) {
+      toast.error("Please enter a message and select at least one lead!");
       return;
     }
-
-    const replyEmails = toEmails.split(",").map(e => e.trim()).filter(e => e);
 
     try {
       const res = await fetch(`${API_BASE}/api/inbox/send`, {
@@ -85,11 +125,12 @@ export default function ThreadView() {
         body: JSON.stringify({
           thread_id,
           body: reply,
-          to: replyEmails,
+          to: selectedLeadEmails,
           user_id,
           subject: thread.subject,
-          sender_name: thread.user_name,
-          org_id
+          sender_name: gmail_user_name,
+          org_id,
+          lead_ids: selectedLeadIds
         }),
       });
 
@@ -97,7 +138,7 @@ export default function ThreadView() {
         toast.success("Reply sent successfully!");
         setReply("");
 
-        // Optimistically update conversation UI
+        // Optimistic UI update
         setConversation(prev => [
           ...prev,
           {
@@ -105,6 +146,7 @@ export default function ThreadView() {
             message: reply,
             sender: "You",
             sender_email: user_email,
+            sender_name: gmail_user_name,
             sent_time: new Date().toISOString(),
           },
         ]);
@@ -130,11 +172,8 @@ export default function ThreadView() {
 
       {thread ? (
         <div className="bg-white rounded-2xl shadow-sm p-6">
-          <h2 className="text-xl font-semibold text-gray-800 mb-6">
-            {thread.subject}
-          </h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-6">{thread.subject}</h2>
 
-          {/* Load previous button */}
           {hasMore && (
             <div className="text-center mb-2">
               <button
@@ -146,7 +185,6 @@ export default function ThreadView() {
             </div>
           )}
 
-          {/* Chat layout */}
           <div className="space-y-4 max-h-[500px] overflow-y-auto">
             {conversation.length === 0 ? (
               <div className="text-center text-gray-400">No messages yet</div>
@@ -160,11 +198,9 @@ export default function ThreadView() {
                         : "bg-gray-100 text-gray-800 rounded-bl-none"
                     }`}>
                       <div className="text-xs font-semibold mb-1 opacity-80">
-                        {msg.sender || (msg.direction === "outbound" ? "You" : msg.sender)}
+                        {`${msg.sender_name}<${msg.sender_email}>` || (msg.direction === "outbound" ? "You" : msg.sender)}
                       </div>
-
                       <div className="text-sm whitespace-pre-line break-words">{msg.message}</div>
-
                       <div className="text-[11px] text-gray-500 mt-1 text-right">
                         {new Date(msg.sent_time).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                       </div>
@@ -175,15 +211,29 @@ export default function ThreadView() {
             )}
           </div>
 
-          {/* Reply Box */}
-          <div className="mt-6 border-t border-gray-200 pt-4 space-y-2">
-            <input
-              type="text"
-              value={toEmails}
-              onChange={(e) => setToEmails(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg p-2 text-gray-700 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-              placeholder="To: comma separated emails"
-            />
+          {/* Reply Box with Leads */}
+          <div className="mt-6 border-t border-gray-200 pt-4 space-y-4">
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">Select Leads to Reply</label>
+              <div className="border rounded-lg p-4 max-h-40 overflow-y-auto space-y-2">
+                {leads.length === 0 ? (
+                  <p className="text-gray-500 text-sm">No leads found.</p>
+                ) : (
+                  leads.map(lead => (
+                    <label key={lead.id} className="flex items-center gap-3">
+                      <input
+                        type="checkbox"
+                        checked={selectedLeadEmails.includes(lead.email)}
+                        onChange={() => handleLeadCheckboxChange(lead.email, lead.id)}
+                        className="h-4 w-4"
+                      />
+                      <span className="text-gray-700">{lead.name} — {lead.email}</span>
+                    </label>
+                  ))
+                )}
+              </div>
+            </div>
+
             <textarea
               value={reply}
               onChange={(e) => setReply(e.target.value)}
@@ -191,6 +241,7 @@ export default function ThreadView() {
               rows={3}
               placeholder="Type your reply..."
             ></textarea>
+
             <button
               onClick={handleReply}
               className="mt-3 px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg text-sm font-medium flex items-center gap-2 hover:shadow-md transition-all"
