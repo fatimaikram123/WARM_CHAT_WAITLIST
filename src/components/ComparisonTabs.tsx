@@ -51,7 +51,7 @@ const ComparisonTabs: React.FC = () => {
     <section className="py-16 bg-gray-50">
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-3">WarmChats vs Mailchimp</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-3">Warmchats vs Mailchimp</h2>
           <p className="text-gray-600 text-lg">
             Compare features, speed, multi-channel support, and pricing at a glance
           </p>

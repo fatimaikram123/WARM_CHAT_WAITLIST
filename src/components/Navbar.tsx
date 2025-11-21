@@ -69,7 +69,7 @@ const Navbar: React.FC = () => {
                 Get Started
               </a>
                 <a href="#process" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all" onClick={(e) => scrollToSection('process', e)}>
-              see it in action
+              See It In Action
             </a>
               {/* <a href="#waitlist" onClick={(e) => scrollToSection('waitlist', e)} className="ml-0.5 px-5 py-2 text-sm bg-gradient-to-r from-warmchats-primary to-warmchats-flame text-white rounded-full hover:shadow-md transition-all hover:scale-105">
                 Join Waitlist
@@ -109,7 +109,7 @@ const Navbar: React.FC = () => {
               Get Started
             </a>
                   <a href="#process" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all" onClick={(e) => scrollToSection('process', e)}>
-             see it in action
+             See It In Action
             </a>
           
 {/*           

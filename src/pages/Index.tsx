@@ -53,7 +53,7 @@ const Index: React.FC = () => {
         {/* <HowItWorks /> */}
         <Benefits />
         <Features />
-        <ComparisonTabs/>
+        {/* <ComparisonTabs/> */}
         <ComparisonTable />
         <Testimonials />
        
