@@ -169,6 +169,18 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                       👥 Lead Management
                     </NavLink>
                   </li>
+                    <li>
+                    <NavLink
+                      to="/thread/leads"
+                      className={({ isActive }) =>
+                        isActive ? activeLink : normalLink
+                      }
+                    >
+                      👥 Threads Lead Assignment 
+                    </NavLink>
+                  </li>
+
+                   
                 </>
               )}
 

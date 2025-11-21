@@ -150,6 +150,7 @@ export default function ThreadView() {
             sent_time: new Date().toISOString(),
           },
         ]);
+        setReply("");
       } else {
         toast.error("Failed to send reply!");
       }
