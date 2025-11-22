@@ -2,45 +2,68 @@ import React, { useEffect, useState } from "react";
 import { format } from "date-fns";
 import MainLayout from "./MainLayout";
 
-interface ThreadLead {
+interface Lead {
+  id: number;
+  name: string;
+  email: string;
+}
+
+interface ThreadGroup {
   thread_id: number;
-  subject: string;
-  lead_id: number;
-  lead_name: string;
-  lead_email: string;
+  thread_subject: string;
   created_at: string;
+  leads: {
+    lead_id: number;
+    lead_name: string;
+    lead_email: string;
+  }[];
 }
 
 const LeadThreadPage: React.FC = () => {
-  const [data, setData] = useState<ThreadLead[]>([]);
+  const [threads, setThreads] = useState<ThreadGroup[]>([]);
+  const [allLeads, setAllLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
   const API_BASE = import.meta.env.VITE_API_BASE;
+  const org_id=localStorage.getItem("org_id");
   const token = localStorage.getItem("token");
 
   useEffect(() => {
-    const fetchThreads = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/inbox/thread/leads`, {
-          method: "GET",
+        // Fetch threads with assigned leads
+        const threadsRes = await fetch(`${API_BASE}/api/inbox/thread/leads`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         });
 
-        if (!res.ok) throw new Error("Failed to fetch threads");
-        const json = await res.json();
-        setData(json);
+        // Fetch all leads
+        const leadsRes = await fetch(`${API_BASE}/api/leads/${org_id}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!threadsRes.ok || !leadsRes.ok)
+          throw new Error("Failed to fetch data");
+
+        const threadsJson = await threadsRes.json();
+        const leadsJson = await leadsRes.json();
+
+        setThreads(threadsJson);
+        setAllLeads(leadsJson);
       } catch (err: any) {
-        setError(err.message || "Error fetching data");
+        setError(err.message);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchThreads();
+    fetchData();
   }, []);
 
   if (loading) return <p>Loading threads...</p>;
@@ -49,36 +72,58 @@ const LeadThreadPage: React.FC = () => {
   return (
     <MainLayout>
       <div className="p-4">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-800">📩 Lead Threads</h1>
-        </div>
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">📩 Lead Threads</h1>
 
-        <div className="bg-white rounded-2xl shadow-sm overflow-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-orange-50 text-gray-600">
-              <tr>
-                <th className="px-4 py-2">Thread ID</th>
-                <th className="px-4 py-2">Subject</th>
-                <th className="px-4 py-2">Lead Name</th>
-                <th className="px-4 py-2">Lead Email</th>
-                <th className="px-4 py-2">Created At</th>
-              </tr>
-            </thead>
+        <div className="space-y-6">
+          {threads.map((thread) => {
+            // Create a Set for O(1) lookup which leads are selected in this thread
+            const assignedLeadIds = new Set(
+              thread.leads.map((l) => l.lead_id)
+            );
 
-            <tbody>
-              {data.map((item) => (
-                <tr key={item.thread_id} className="hover:bg-gray-50">
-                  <td className="px-4 py-2">{item.thread_id}</td>
-                  <td className="px-4 py-2">{item.subject}</td>
-                  <td className="px-4 py-2">{item.lead_name}</td>
-                  <td className="px-4 py-2">{item.lead_email}</td>
-                  <td className="px-4 py-2">
-                    {format(new Date(item.created_at), "yyyy-MM-dd HH:mm")}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+            return (
+              <div
+                key={thread.thread_id}
+                className="bg-white shadow-sm rounded-xl p-5 border border-gray-200"
+              >
+                {/* Thread Header */}
+                <div className="pb-3 mb-4 border-b">
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    Thread #{thread.thread_id}: {thread.thread_subject}
+                  </h2>
+                  <p className="text-sm text-gray-500">
+                    Created:{" "}
+                    {format(new Date(thread.created_at), "yyyy-MM-dd HH:mm")}
+                  </p>
+                </div>
+
+                {/* Leads Section */}
+                <h3 className="font-semibold text-gray-700 mb-3">
+                  Select Leads for this Thread
+                </h3>
+
+                <div className="space-y-2">
+                  {allLeads.map((lead) => (
+                    <label
+                      key={lead.id}
+                      className="flex items-center gap-3 p-2 border rounded-lg hover:bg-gray-50"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={assignedLeadIds.has(lead.id)}
+                        readOnly
+                        className="w-4 h-4"
+                      />
+                      <div>
+                        <p className="font-medium text-gray-800">{lead.name}</p>
+                        <p className="text-sm text-gray-500">{lead.email}</p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       </div>
     </MainLayout>
