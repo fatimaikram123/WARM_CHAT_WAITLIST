@@ -5,6 +5,16 @@
 @tailwind components;
 @tailwind utilities;
 
+
+gptengineer-chat-widget,
+gptengineer-chat-button,
+#gptengineer-chat-widget,
+#gptengineer-chat-button {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

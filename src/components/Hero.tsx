@@ -124,9 +124,9 @@ const Hero: React.FC = () => {
           </div>
         </div>
       </div>
-
+{/* 
       {/* 🔥 Floating Fire Chat Button */}
-      <div className="fixed bottom-6 right-6 flex flex-col items-center space-y-1 z-50">
+      {/* <div className="fixed bottom-6 right-6 flex flex-col items-center space-y-1 z-50">
         {!assistantOpen ? (
           <>
             <span className="text-xs text-gray-500 mb-1 animate-pulse">
@@ -148,7 +148,7 @@ const Hero: React.FC = () => {
         ) : (
           <div className="w-80 h-[500px] bg-white rounded-2xl shadow-2xl border border-gray-200 flex flex-col overflow-hidden relative animate-fadeIn">
             {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-t-2xl">
+            {/* <div className="flex items-center justify-between px-4 py-3 border-b bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-t-2xl">
               <div className="flex items-center gap-2">
                 <Flame className="w-5 h-5" />
                 <h3 className="font-semibold">WarmChats Assistant</h3>
@@ -162,7 +162,7 @@ const Hero: React.FC = () => {
             </div>
 
             {/* Chat area */}
-            <div className="flex-1 overflow-y-auto px-4 py-3 bg-gray-50">
+            {/* <div className="flex-1 overflow-y-auto px-4 py-3 bg-gray-50">
               <div className="flex items-start gap-2 mb-3">
                 <div className="w-7 h-7 rounded-full bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center text-white text-sm font-bold">
                   A
@@ -181,7 +181,7 @@ const Hero: React.FC = () => {
             </div>
 
             {/* Input */}
-            <div className="border-t bg-white p-3 flex items-center gap-2">
+            {/* <div className="border-t bg-white p-3 flex items-center gap-2">
               <input
                 type="text"
                 placeholder="Type a message..."
@@ -193,7 +193,7 @@ const Hero: React.FC = () => {
             </div>
           </div>
         )}
-      </div>
+      </div>   */}
     </section>
   );
 };
