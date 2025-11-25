@@ -33,7 +33,7 @@ const ThreadPage: React.FC = () => {
 
   const handleSend = async () => {
     if (!newMessage.trim()) return;
-    await fetch(`${API_BASE}/api/inbox/thread/send`, {
+    await fetch(`${API_BASE}/api/inbox/thread/send/reply`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({

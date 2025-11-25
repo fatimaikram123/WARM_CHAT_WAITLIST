@@ -23,7 +23,7 @@ export default function ThreadView() {
   const [leads, setLeads] = useState([]);
   const [selectedLeadEmails, setSelectedLeadEmails] = useState([]);
   const [selectedLeadIds, setSelectedLeadIds] = useState([]);
-  const limit = 20;
+  const limit = 100;
 
   // Fetch leads list for checkbox
   useEffect(() => {
@@ -115,7 +115,7 @@ export default function ThreadView() {
     }
 
     try {
-      const res = await fetch(`${API_BASE}/api/inbox/send`, {
+      const res = await fetch(`${API_BASE}/api/inbox/send/reply`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

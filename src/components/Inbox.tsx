@@ -32,37 +32,35 @@ export default function Inbox() {
 
   const navigate = useNavigate();
 
-  // ⬇️ Sync incoming inbox
-  const syncEmailsFromInbox = async () => {
-    try {
-      const res = await fetch(
-        `${API_BASE}/api/inbox/fetch/${userId}/${org_id}?page=${page}&limit=${limit}`,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
-          },
-        }
-      );
+  // -------------------------------
+  // Fire-and-forget /fetch API background with toast
+  // -------------------------------
+  const backgroundFetchAllPages = () => {
+    let currentPage = 1;
 
-      if (!res.ok) throw new Error("Failed to fetch emails");
-      const data = await res.json();
-      toast.success(`Emails synced (${data.threads_checked} new).`);
-      fetchEmails();
-    } catch (err) {
-      console.error(err);
-      toast.error("Failed to sync inbox.");
-    }
-  };
+    const fetchPage = () => {
+      fetch(`${API_BASE}/api/inbox/fetch/${userId}/${org_id}?page=${currentPage}&limit=${limit}`, {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+          "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log("Background fetch page", currentPage, data);
 
-  const handleSync = async () => {
-    try {
-      setIsSyncing(true);
-      await syncEmailsFromInbox();
-    } finally {
-      setIsSyncing(false);
-    }
+          if (currentPage < data.totalPages) {
+            currentPage++;
+            fetchPage();
+          }
+        })
+        .catch((err) => {
+          console.error("Background fetch error:", err);
+        });
+    };
+
+    fetchPage(); // Start fetching
   };
 
   // ⬇️ Fetch already-stored emails with pagination
@@ -86,6 +84,7 @@ export default function Inbox() {
       // Set pagination
       setTotalPages(data.pages || 1);
 
+      // Map messages and include unread status
       const formatted = (data.messages || []).map((m) => ({
         id: m.id,
         sender: m.sender || "Unknown",
@@ -95,6 +94,7 @@ export default function Inbox() {
         time: new Date(m.created_at || Date.now()).toLocaleString(),
         from: m.sender,
         thread_id: m.thread_id,
+        is_unread: m.is_unread || false, // ⬅️ key for unread styling
       }));
 
       setMessages(formatted);
@@ -104,28 +104,23 @@ export default function Inbox() {
     }
   };
 
+  useEffect(() => {
+    if (userId && token) {
+      backgroundFetchAllPages();
+    }
+  }, [userId, token]);
+
   // ⬇️ Fetch on load + when page changes
   useEffect(() => {
     if (userId && token) fetchEmails();
   }, [userId, token, page]);
-  // useEffect(() => {
-  // const fetchInbox = async () => {
-  //   if (userId && token) {
-  //     await syncEmailsFromInbox();
-  //   }
-  // };
-
-//   fetchInbox();
-// }, [userId, token, page]);
-
 
   // ⬇️ Filter tabs
   const filteredMessages =
     activeTab === "All"
       ? messages
       : messages.filter((m) => {
-          if (activeTab === "Email")
-            return m.channel?.toLowerCase() === "email";
+          if (activeTab === "Email") return m.channel?.toLowerCase() === "email";
           if (activeTab === "SMS") return m.channel?.toLowerCase() === "sms";
           return true;
         });
@@ -192,22 +187,6 @@ export default function Inbox() {
           >
             <Send size={16} /> New Message
           </button>
-
-          <button
-            onClick={handleSync}
-            disabled={isSyncing}
-            className="px-4 py-2 bg-orange-500 text-white rounded-lg flex items-center gap-2"
-          >
-            {isSyncing ? (
-              <>
-                <RotateCw className="animate-spin" /> Syncing…
-              </>
-            ) : (
-              <>
-                <RotateCw /> Sync Email
-              </>
-            )}
-          </button>
         </div>
 
         <Toaster position="top-right" />
@@ -243,7 +222,9 @@ export default function Inbox() {
                   setSelected(msg);
                   navigate(`/inbox/thread/${msg.thread_id}`);
                 }}
-                className={`p-5 cursor-pointer hover:bg-orange-50`}
+                className={`p-5 cursor-pointer hover:bg-orange-100 ${
+                  msg.is_unread ?  "bg-orange-100 font-semibold":"bg-white"
+                }`}
               >
                 <div className="flex justify-between">
                   <div>
