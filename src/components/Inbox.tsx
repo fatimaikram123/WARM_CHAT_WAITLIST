@@ -33,19 +33,22 @@ export default function Inbox() {
   const navigate = useNavigate();
 
   // -------------------------------
-  // Fire-and-forget /fetch API background with toast
+  // Fire-and-forget /fetch API background
   // -------------------------------
   const backgroundFetchAllPages = () => {
     let currentPage = 1;
 
     const fetchPage = () => {
-      fetch(`${API_BASE}/api/inbox/fetch/${userId}/${org_id}?page=${currentPage}&limit=${limit}`, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-          "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
-        },
-      })
+      fetch(
+        `${API_BASE}/api/inbox/fetch/${userId}/${org_id}?page=${currentPage}&limit=${limit}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+          },
+        }
+      )
         .then((res) => res.json())
         .then((data) => {
           console.log("Background fetch page", currentPage, data);
@@ -60,7 +63,7 @@ export default function Inbox() {
         });
     };
 
-    fetchPage(); // Start fetching
+    fetchPage(); // Start fetching all pages
   };
 
   // ⬇️ Fetch already-stored emails with pagination
@@ -81,10 +84,8 @@ export default function Inbox() {
 
       const data = await res.json();
 
-      // Set pagination
       setTotalPages(data.pages || 1);
 
-      // Map messages and include unread status
       const formatted = (data.messages || []).map((m) => ({
         id: m.id,
         sender: m.sender || "Unknown",
@@ -94,7 +95,7 @@ export default function Inbox() {
         time: new Date(m.created_at || Date.now()).toLocaleString(),
         from: m.sender,
         thread_id: m.thread_id,
-        is_unread: m.is_unread || false, // ⬅️ key for unread styling
+        is_unread: m.is_unread || false,
       }));
 
       setMessages(formatted);
@@ -104,13 +105,28 @@ export default function Inbox() {
     }
   };
 
+  // ⬇️ Run the background fetch once on first load
+  // useEffect(() => {
+  //   if (userId && token) {
+  //     backgroundFetchAllPages();
+  //   }
+
+
+  // }, [userId, token]);
+
+  // ⬇️ Auto-refresh ALL pages every 1 minute
   useEffect(() => {
-    if (userId && token) {
+    if (!userId || !token) return;
+
+    const interval = setInterval(() => {
+      console.log("Auto refresh running: fetching all inbox pages...");
       backgroundFetchAllPages();
-    }
+    }, 30000); // 30 seconds
+
+    return () => clearInterval(interval);
   }, [userId, token]);
 
-  // ⬇️ Fetch on load + when page changes
+  // ⬇️ Fetch local stored emails whenever page changes
   useEffect(() => {
     if (userId && token) fetchEmails();
   }, [userId, token, page]);
@@ -156,7 +172,6 @@ export default function Inbox() {
     }
   };
 
-  // ⬇️ AI reply (fake)
   const handleGenerateAIReply = (msg) => {
     setSelected(msg);
     setLoading(true);
@@ -223,7 +238,7 @@ export default function Inbox() {
                   navigate(`/inbox/thread/${msg.thread_id}`);
                 }}
                 className={`p-5 cursor-pointer hover:bg-orange-100 ${
-                  msg.is_unread ?  "bg-orange-100 font-semibold":"bg-white"
+                  msg.is_unread ? "bg-orange-100 font-semibold" : "bg-white"
                 }`}
               >
                 <div className="flex justify-between">
@@ -263,7 +278,7 @@ export default function Inbox() {
         </button>
       </div>
 
-      {/* AI reply box */}
+      {/* AI Reply UI */}
       {loading && (
         <div className="mt-6 bg-white p-4 rounded-xl border text-center text-gray-600">
           <Loader2 className="animate-spin w-5 h-5 inline-block mr-2" />

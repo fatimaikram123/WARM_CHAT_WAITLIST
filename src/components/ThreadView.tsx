@@ -25,6 +25,29 @@ export default function ThreadView() {
   const [selectedLeadIds, setSelectedLeadIds] = useState([]);
   const limit = 100;
 
+
+
+  useEffect(() => {
+  if (!thread_id || !user_id || !org_id) return;
+
+  const interval = setInterval(() => {
+    fetch(`${API_BASE}/api/inbox/thread/fetch/${user_id}/${org_id}/${thread_id}`, {
+      
+      headers: { Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json" }
+    })
+      .then(res => res.json())
+      .then(() => {
+        // Re-fetch thread messages to update frontend automatically
+        fetchThread(true);
+      })
+      .catch(err => console.log("Auto-fetch error:", err));
+
+  }, 30000); // 30 seconds
+
+  return () => clearInterval(interval);
+}, [thread_id, user_id, org_id]);  
+
   // Fetch leads list for checkbox
   useEffect(() => {
     fetch(`${API_BASE}/api/leads/${org_id}`, {
