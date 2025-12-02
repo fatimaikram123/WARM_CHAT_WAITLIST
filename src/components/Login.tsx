@@ -27,6 +27,8 @@ const Login: React.FC = () => {
         setLoading(false);
         return;
       }
+      const decoded = JSON.parse(atob(data.access_token.split(".")[1]));
+      localStorage.setItem("token_exp", (decoded.exp * 1000).toString());
 
       // ✅ Save token and user info
       localStorage.setItem("token", data.access_token);

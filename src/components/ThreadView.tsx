@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"; 
 import { useParams, useNavigate } from "react-router-dom";
 import MainLayout from "../components/MainLayout";
-import { ArrowLeft, Send } from "lucide-react";
+import { ArrowLeft, Send, Wand2 } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function ThreadView() {
@@ -24,31 +24,35 @@ export default function ThreadView() {
   const [selectedLeadEmails, setSelectedLeadEmails] = useState([]);
   const [selectedLeadIds, setSelectedLeadIds] = useState([]);
   const limit = 100;
+  const [aiSuggestions, setAiSuggestions] = useState([]);
 
 
+  // AI states
+  const [loadingAI, setLoadingAI] = useState(false);
+  const [aiTone, setAiTone] = useState("Friendly");
+  const [aiPersona, setAiPersona] = useState("Sales Representative");
+  const [aiChannel, setAiChannel] = useState("email");
 
+  // -------------------- Auto-fetch interval --------------------
   useEffect(() => {
-  if (!thread_id || !user_id || !org_id) return;
+    if (!thread_id || !user_id || !org_id) return;
 
-  const interval = setInterval(() => {
-    fetch(`${API_BASE}/api/inbox/thread/fetch/${user_id}/${org_id}/${thread_id}`, {
-      
-      headers: { Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json" }
-    })
-      .then(res => res.json())
-      .then(() => {
-        // Re-fetch thread messages to update frontend automatically
-        fetchThread(true);
+    const interval = setInterval(() => {
+      fetch(`${API_BASE}/api/inbox/thread/fetch/${user_id}/${org_id}/${thread_id}`, {
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json"
+        }
       })
-      .catch(err => console.log("Auto-fetch error:", err));
+        .then(res => res.json())
+        .then(() => fetchThread(true))
+        .catch(err => console.log("Auto-fetch error:", err));
+    }, 30000);
 
-  }, 30000); // 30 seconds
+    return () => clearInterval(interval);
+  }, [thread_id, user_id, org_id]);
 
-  return () => clearInterval(interval);
-}, [thread_id, user_id, org_id]);  
-
-  // Fetch leads list for checkbox
+  // -------------------- Fetch leads --------------------
   useEffect(() => {
     fetch(`${API_BASE}/api/leads/${org_id}`, {
       headers: { Authorization: `Bearer ${token}` },
@@ -58,7 +62,7 @@ export default function ThreadView() {
       .catch(() => console.log("Failed to load leads"));
   }, [API_BASE, org_id, token]);
 
-  // Fetch thread messages with pagination
+  // -------------------- Fetch thread messages --------------------
   const fetchThread = async (reset = false) => {
     try {
       const res = await fetch(`${API_BASE}/api/inbox/thread/${thread_id}/${user_id}?limit=${limit}&offset=${reset ? 0 : offset}`, {
@@ -87,14 +91,13 @@ export default function ThreadView() {
   };
 
   useEffect(() => {
-    fetchThread(true); // Fetch latest 20 on mount
+    fetchThread(true);
   }, [thread_id]);
 
-  // Preselect leads based on conversation inbound emails AND thread.lead_ids
+  // -------------------- Preselect leads --------------------
   useEffect(() => {
     if (!thread || leads.length === 0) return;
 
-    // Emails from inbound messages (exclude user)
     const uniqueEmails = Array.from(
       new Set(
         (conversation || [])
@@ -104,14 +107,10 @@ export default function ThreadView() {
       )
     );
 
-    // Lead IDs from thread.lead_ids
     const leadIdsFromThread = thread.lead_ids || [];
 
     const matchedLeadIds = leads
-      .filter(
-        lead =>
-          uniqueEmails.includes(lead.email) || leadIdsFromThread.includes(lead.id)
-      )
+      .filter(lead => uniqueEmails.includes(lead.email) || leadIdsFromThread.includes(lead.id))
       .map(lead => lead.id);
 
     const matchedLeadEmails = leads
@@ -131,6 +130,7 @@ export default function ThreadView() {
     );
   };
 
+  // -------------------- Send reply --------------------
   const handleReply = async () => {
     if (!reply.trim() || selectedLeadEmails.length === 0) {
       toast.error("Please enter a message and select at least one lead!");
@@ -159,9 +159,6 @@ export default function ThreadView() {
 
       if (res.ok) {
         toast.success("Reply sent successfully!");
-        setReply("");
-
-        // Optimistic UI update
         setConversation(prev => [
           ...prev,
           {
@@ -182,6 +179,99 @@ export default function ThreadView() {
       toast.error("Failed to send reply!");
     }
   };
+const handleGenerateAI = async () => {
+  if (selectedLeadEmails.length === 0) {
+    toast.error("Please select at least one lead for AI generation!");
+    return;
+  }
+
+  setLoadingAI(true);
+  try {
+    const lead_data = leads
+      .filter(lead => selectedLeadIds.includes(lead.id))
+      .map(lead => ({
+        id: lead.id,
+        name: lead.name,
+        email: lead.email,
+        company: lead.company,
+        role: lead.role
+      }));
+
+    const res = await fetch(`${API_BASE}/api/ai/generate/reply`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        conversation,
+        tone: aiTone,
+        persona: aiPersona,
+        channel: aiChannel,
+        lead_data,
+        num_messages: 5
+      }),
+    });
+
+    const data = await res.json();
+    const ai = data.response;
+    const aiMessage =
+  Array.isArray(ai.message)
+    ? ai.message.join("\n")
+    : typeof ai.message === "string"
+      ? ai.message
+      : "";
+
+setReply(aiMessage);
+    setAiSuggestions(ai.reply_suggestions || []);
+    
+  } catch (err) {
+    console.error(err);
+    toast.error("❌ Failed to generate AI reply");
+  }
+  setLoadingAI(false);
+};
+
+  // -------------------- Generate AI reply --------------------
+  // const handleGenerateAI = async () => {
+  //   if (selectedLeadEmails.length === 0) {
+  //     toast.error("Please select at least one lead for AI generation!");
+  //     return;
+  //   }
+
+  //   setLoadingAI(true);
+  //   try {
+  //     const lead_data = leads
+  //       .filter(lead => selectedLeadIds.includes(lead.id))
+  //       .map(lead => ({
+  //         id: lead.id,
+  //         name: lead.name,
+  //         email: lead.email,
+  //         company: lead.company,
+  //         role: lead.role
+  //       }));
+
+  //     const prompt = reply || conversation[conversation.length - 1]?.message || "";
+
+  //     const res = await fetch(`${API_BASE}/api/ai/generate`, {
+  //       method: "POST",
+  //       headers: { "Content-Type": "application/json" },
+  //       body: JSON.stringify({
+  //         prompt,
+  //         tone: aiTone,
+  //         persona: aiPersona,
+  //         channel: aiChannel,
+  //         lead_data
+  //       }),
+  //     });
+
+  //     const data = await res.json();
+  //     const ai = data.response;
+
+  //     setReply(`${ai.message}\n\n💬 Reply Suggestions:\n• ${ai.reply_suggestions[0]}\n• ${ai.reply_suggestions[1]}\n• ${ai.reply_suggestions[2]}\nIntent: ${ai.intent}`);
+  //   } catch (err) {
+  //     console.error(err);
+  //     toast.error("❌ Failed to generate AI reply");
+  //   }
+  //   setLoadingAI(false);
+  // };
 
   return (
     <MainLayout>
@@ -216,11 +306,7 @@ export default function ThreadView() {
               conversation.map((msg, i) => (
                 <div key={i} data-lov-id={msg.id}>
                   <div className={`flex ${msg.direction === "outbound" ? "justify-end" : "justify-start"}`}>
-                    <div className={`max-w-[75%] rounded-2xl p-3 shadow-sm ${
-                      msg.direction === "outbound"
-                        ? "bg-orange-500 text-white rounded-br-none"
-                        : "bg-gray-100 text-gray-800 rounded-bl-none"
-                    }`}>
+                    <div className={`max-w-[75%] rounded-2xl p-3 shadow-sm ${msg.direction === "outbound" ? "bg-orange-500 text-white rounded-br-none" : "bg-gray-100 text-gray-800 rounded-bl-none"}`}>
                       <div className="text-xs font-semibold mb-1 opacity-80">
                         {`${msg.sender_name}<${msg.sender_email}>` || (msg.direction === "outbound" ? "You" : msg.sender)}
                       </div>
@@ -237,6 +323,7 @@ export default function ThreadView() {
 
           {/* Reply Box with Leads */}
           <div className="mt-6 border-t border-gray-200 pt-4 space-y-4">
+            {/* Leads Selection */}
             <div>
               <label className="block text-gray-700 font-medium mb-2">Select Leads to Reply</label>
               <div className="border rounded-lg p-4 max-h-40 overflow-y-auto space-y-2">
@@ -258,17 +345,96 @@ export default function ThreadView() {
               </div>
             </div>
 
-            <textarea
-              value={reply}
-              onChange={(e) => setReply(e.target.value)}
-              className="w-full border border-gray-300 rounded-lg p-3 text-gray-700 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
-              rows={3}
-              placeholder="Type your reply..."
-            ></textarea>
+            {/* AI Options */}
+            <div className="flex items-center gap-2 mb-2">
+              <select
+                value={aiTone}
+                onChange={(e) => setAiTone(e.target.value)}
+                className="border rounded p-2 text-sm"
+              >
+                <option>Friendly</option>
+                <option>Professional</option>
+                <option>Formal</option>
+                <option>Casual</option>
+                <option>Persuasive</option>
+                <option>Informative</option>
+                <option>Empathetic</option>
+              </select>
 
+              <select
+                value={aiPersona}
+                onChange={(e) => setAiPersona(e.target.value)}
+                className="border rounded p-2 text-sm"
+              >
+                <option>Sales Representative</option>
+                <option>Customer Support</option>
+                <option>Technical Specialist</option>
+                <option>Marketing Expert</option>
+                <option>Product Manager</option>
+              </select>
+            </div>
+
+            {/* Reply textarea with AI button */}
+            {/* Reply textarea with AI button */}
+<div className="relative">
+  <textarea
+    value={reply}
+    onChange={(e) => setReply(e.target.value)}
+    className="w-full border border-gray-300 rounded-lg p-3 pr-20 text-gray-700 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+    rows={3}
+    placeholder="Type your reply..."
+  ></textarea>
+
+  {/* AI Button */}
+  <div className="absolute top-2 right-2 flex items-center gap-1">
+    <button
+      onClick={handleGenerateAI}
+      className="bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-full shadow-md flex items-center justify-center"
+      title="Generate AI Reply"
+    >
+      {loadingAI ? (
+        <span className="animate-spin w-4 h-4 border-2 border-white rounded-full border-t-transparent"></span>
+      ) : (
+        <Wand2 size={16} />
+      )}
+    </button>
+  </div>
+</div>
+
+{/* ⭐ AI SUGGESTION TAG PILLS (paste this ) */}
+{aiSuggestions.length > 0 && (
+  <div className="flex flex-wrap gap-2 mt-3">
+    {aiSuggestions.map((s, index) => (
+      <button
+        key={index}
+        onClick={() => setReply(s)}
+        className="
+          px-3 py-1 
+          bg-orange-100 
+          text-orange-700 
+          border border-orange-300 
+          rounded-full 
+          text-xs 
+          hover:bg-orange-200 
+          transition
+        "
+      >
+        {s}
+      </button>
+    ))}
+  </div>
+)}
+
+{/* Send Reply Button */}
+
+
+
+            {/* Send Reply Button */}
             <button
               onClick={handleReply}
-              className="mt-3 px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg text-sm font-medium flex items-center gap-2 hover:shadow-md transition-all"
+              className={`mt-3 px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg text-sm font-medium flex items-center gap-2 hover:shadow-md transition-all
+                ${(!reply.trim() || selectedLeadEmails.length === 0) ? "opacity-50 cursor-not-allowed" : ""}`}
+              disabled={!reply.trim() || selectedLeadEmails.length === 0}
             >
               <Send size={14} /> Send Reply
             </button>

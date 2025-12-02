@@ -3,12 +3,10 @@ import MainLayout from "../components/MainLayout";
 import {
   Brain,
   Sparkles,
-  MessageSquareText,
   CheckCircle2,
   Loader2,
   Wand2,
   Bot,
-  SendHorizonal,
   TrendingUp,
   BarChart3,
   Star,
@@ -23,20 +21,53 @@ export default function AIWriter() {
   const [prompt, setPrompt] = useState("");
   const [tone, setTone] = useState("Friendly");
   const [persona, setPersona] = useState("Sales Representative");
-  const [response, setResponse] = useState("");
+  const [response, setResponse] = useState({
+  messageText: "",
+  reply_suggestions: [],
+  intent: "",
+});
+
   const [loading, setLoading] = useState(false);
+  const API_BASE = import.meta.env.VITE_API_BASE;
 
-  const handleGenerate = () => {
-    if (!prompt.trim()) return;
-    setLoading(true);
+  const handleGenerate = async () => {
+  setLoading(true);
+  setResponse({ messageText: "", reply_suggestions: [], intent: "" });
 
-    setTimeout(() => {
-      setResponse(
-        `💬 **Persona:** ${persona}\n🎯 **Tone:** ${tone}\n\n✨ *AI-Generated Outreach Copy:*\n\n"Hey there 👋, I noticed you’re exploring ways to improve your outreach. We’ve helped dozens of ${persona.toLowerCase()}s boost reply rates by 35%. Would you be open to a quick chat this week?"\n\n🤖 *AI Follow-up Draft (Understands Tone + Intent)*\n**Customer:** “Not interested.”\n**AI Suggests:** “Totally fine — quick question though: would it make sense if I share how others saved 5hrs/week automating replies?”\n\n🧠 *Brand Tone Match:* 93% (auto-learned from sent emails)\n📈 *Engagement Prediction:* +22% higher replies\n🔥 *WarmScore™:* 86/100`
-      );
-      setLoading(false);
-    }, 1800);
-  };
+  try {
+    const res = await fetch(`${API_BASE}/api/ai/generate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ prompt, tone, persona }),
+    });
+
+    const data = await res.json();
+    const ai = data.response;
+    const messageText =
+    Array.isArray(ai.message)
+    ? ai.message.join("\n")
+    : typeof ai.message === "string"
+      ? ai.message
+      : "";
+
+    // // Normalize message (array → string)
+    // const messageText = Array.isArray(ai.message)
+    //   ? ai.message.join("\n")
+    //   : ai.message || "";
+
+    setResponse({
+      messageText,
+      reply_suggestions: ai.reply_suggestions || [],
+      intent: ai.intent || "Unknown",
+    });
+  } catch (err) {
+    console.error(err);
+    setResponse({ messageText: "Error generating AI response.", reply_suggestions: [], intent: "" });
+  }
+
+  setLoading(false);
+};
+
 
   return (
     <MainLayout>
@@ -51,21 +82,21 @@ export default function AIWriter() {
               Understand tone, generate 2-way replies, score leads, sync with CRMs, and analyze engagement — all in one place.
             </p>
           </div>
-          <button
+          {/* <button
+           disabled={!prompt.trim() }
             onClick={handleGenerate}
-            className="flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg shadow hover:shadow-md font-semibold transition"
+            className={`flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg shadow hover:shadow-md font-semibold transition${
+    !prompt.trim() ? "opacity-50 cursor-not-allowed" : ""} `}
           >
             <Sparkles size={18} /> Generate Smart Copy
-          </button>
+          </button> */}
         </div>
 
         {/* Persona & Tone Selectors */}
         <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
           <div className="grid sm:grid-cols-2 gap-6">
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                👤 Choose Persona
-              </label>
+              <label className="block text-gray-700 font-medium mb-2">👤 Choose Persona</label>
               <select
                 value={persona}
                 onChange={(e) => setPersona(e.target.value)}
@@ -80,9 +111,7 @@ export default function AIWriter() {
             </div>
 
             <div>
-              <label className="block text-gray-700 font-medium mb-2">
-                🎙️ Select Tone
-              </label>
+              <label className="block text-gray-700 font-medium mb-2">🎙️ Select Tone</label>
               <select
                 value={tone}
                 onChange={(e) => setTone(e.target.value)}
@@ -99,9 +128,7 @@ export default function AIWriter() {
 
           {/* Prompt Input */}
           <div className="mt-6">
-            <label className="block text-gray-700 font-medium mb-2">
-              ✍️ Message Idea or Context
-            </label>
+            <label className="block text-gray-700 font-medium mb-2">✍️ Message Idea or Context</label>
             <textarea
               rows={4}
               placeholder="e.g. Follow up after demo, handle objection, or re-engage old lead..."
@@ -112,26 +139,30 @@ export default function AIWriter() {
           </div>
 
           <div className="flex justify-end mt-4">
-            <button
-              onClick={handleGenerate}
-              disabled={loading}
-              className="px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:shadow flex items-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="animate-spin w-5 h-5" /> Thinking...
-                </>
-              ) : (
-                <>
-                  <Wand2 size={18} /> Generate Copy
-                </>
-              )}
-            </button>
+             <button
+  onClick={handleGenerate}
+  disabled={!prompt.trim() || loading}
+  className={`px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg hover:shadow flex items-center gap-2 ${
+    !prompt.trim() ? "opacity-50 cursor-not-allowed" : ""
+  }`}
+>
+  {loading ? (
+    <>
+      <Loader2 className="animate-spin w-5 h-5" /> Thinking...
+    </>
+  ) : (
+    <>
+      <Wand2 size={18} /> Generate Copy
+    </>
+  )}
+ 
+              </button>
+            
           </div>
         </div>
 
         {/* AI Response + Insights */}
-        {response && (
+        {response && response.messageText && (
           <>
             <div className="grid md:grid-cols-3 gap-6 mt-6">
               {/* Main AI Response */}
@@ -139,9 +170,29 @@ export default function AIWriter() {
                 <h2 className="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
                   <Bot className="text-orange-500 w-5 h-5" /> AI Draft
                 </h2>
-                <div className="whitespace-pre-line text-gray-700 leading-relaxed">
-                  {response}
-                </div>
+                <div className="whitespace-pre-line text-gray-700 leading-relaxed mb-4">
+  {response.messageText}
+</div>
+
+{/* Reply Suggestions as Pills */}
+{/* {response.reply_suggestions?.length > 0 && (
+  <div className="mt-3 flex flex-wrap gap-2">
+    {response.reply_suggestions.map((s, idx) => (
+      <span
+        key={idx}
+        className="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-sm cursor-pointer hover:bg-orange-200 transition"
+      >
+        {s}
+      </span>
+    ))}
+  </div>
+)} */}
+
+{/* Intent */}
+{/* <div className="mt-4 text-sm font-semibold text-gray-800">
+  🎯 Intent: <span className="text-orange-600">{response.intent}</span>
+</div> */}
+                {/* <div className="whitespace-pre-line text-gray-700 leading-relaxed">{response}</div> */}
               </div>
 
               {/* Insights */}
@@ -207,8 +258,7 @@ export default function AIWriter() {
           <div className="flex flex-col items-center justify-center mt-16 text-center text-gray-500">
             <Brain className="w-12 h-12 text-orange-400 mb-3" />
             <p className="text-lg font-medium">
-              Start by entering a message idea — your AI assistant will write,
-              analyze, and score your outreach.
+              Start by entering a message idea — your AI assistant will write, analyze, and score your outreach.
             </p>
           </div>
         )}
