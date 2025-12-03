@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { PrinterCheck } from 'lucide-react';
 import PricingForAdmin from '../components/PricingForAdmin';
 import ComparisonTabs from '@/components/ComparisonTabs';
+import SequencesPage from '@/components/SequencesPage';
 
 const Index: React.FC = () => {
     const navigate = useNavigate();
@@ -47,6 +48,7 @@ const Index: React.FC = () => {
       {/* <Sidebar/> */}
       <main>
         <Hero />
+       
         {/* <WaitlistCTA /> */}
          <PricingForAdmin/>
         <ProcessVisualization />

@@ -129,16 +129,17 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                       📢 Multichannel Campaigns
                     </NavLink>
                   </li>
-                  {/* <li>
+                 
+                  <li>
                     <NavLink
-                      to="/followups"
+                      to="/sequences"
                       className={({ isActive }) =>
                         isActive ? activeLink : normalLink
                       }
                     >
                       🔁 Smart Follow-Ups
                     </NavLink>
-                  </li> */}
+                  </li>
                   <li>
                     <NavLink
                       to="/ai-writer"
