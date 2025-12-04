@@ -46,7 +46,7 @@ const Index: React.FC = () => {
       <Navbar />
   
       {/* <Sidebar/> */}
-      <main>
+      <main className="space-y-20 md:space-y-28">
         <Hero />
        
         {/* <WaitlistCTA /> */}
