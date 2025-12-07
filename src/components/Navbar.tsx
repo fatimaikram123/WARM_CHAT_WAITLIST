@@ -33,10 +33,10 @@ const Navbar: React.FC = () => {
 
   return (
     <nav 
-      className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 rounded-full ${
+      className={`fixed top-4 left-1/2 -translate-x-1/2 z-50 transition-all duration-300 w-full ${
         isScrolled
-          ? 'bg-white/95 shadow-lg w-[90%] md:w-[75%] max-w-5xl backdrop-blur-sm'
-          : 'bg-white/50 w-[90%] md:w-[70%] max-w-4xl backdrop-blur-sm'
+          ? ' shadow-lg  backdrop-blur-sm'
+          : ' backdrop-blur-sm'
       }`}
     >
       <div className="px-4 md:px-6 py-3 flex items-center justify-between">
@@ -56,19 +56,19 @@ const Navbar: React.FC = () => {
 
         {/* Desktop Navigation */}
         <div className="hidden md:flex items-center space-x-3">
-          <div className="bg-white/70 rounded-full p-1.5 backdrop-blur-sm">
+          <div className=" rounded-full p-1.5 backdrop-blur-sm">
             <div className="flex items-center gap-1">
              
-                <a href="#features" onClick={(e) => scrollToSection('features', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white">
+                <a  onClick={(e) => navigate("/features")} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white cursor-pointer">
                 Features  
               </a>
-                  <a href="#pricing" onClick={(e) => scrollToSection('pricing', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white">
+                  <a href="#pricing" onClick={(e) => scrollToSection('pricing', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white cursor-pointer">
                 Pricing
               </a>
-               <a href="#how-it-works" onClick={(e) => scrollToSection('hero', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white">
+               <a href="#how-it-works" onClick={(e) => scrollToSection('hero', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white cursor-pointer">
                 Get Started
               </a>
-                <a href="#process" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all" onClick={(e) => scrollToSection('process', e)}>
+                <a href="#process" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all cursor-pointer" onClick={(e) => scrollToSection('process', e)}>
               See It In Action
             </a>
               {/* <a href="#waitlist" onClick={(e) => scrollToSection('waitlist', e)} className="ml-0.5 px-5 py-2 text-sm bg-gradient-to-r from-warmchats-primary to-warmchats-flame text-white rounded-full hover:shadow-md transition-all hover:scale-105">
@@ -99,7 +99,7 @@ const Navbar: React.FC = () => {
       {mobileMenuOpen && (
         <div className="md:hidden absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
           <div className="p-2 flex flex-col gap-1">
-               <a href="#features" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all" onClick={(e) => scrollToSection('features', e)}>
+               <a className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all" onClick={(e) => navigate("/features")}>
               Features
             </a>
             <a href="#pricing" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all" onClick={(e) => scrollToSection('pricing', e)}>

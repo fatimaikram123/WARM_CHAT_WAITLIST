@@ -38,6 +38,7 @@ import SessionExpiredModal from "./components/SessionExpiredModal";
 import Sidebar from "./components/SideBar";
 import LeadThreadPage from "./components/LeadThreadPage";
 import SequencesPage from "./components/SequencesPage";
+import FeaturesPage from "./pages/Features";
 const queryClient = new QueryClient();
 
 const App: React.FC = () => {
@@ -108,6 +109,7 @@ const App: React.FC = () => {
           <Route path="/signup" element={<Signup />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/waitlist" element={<Waitlist />} />
+          <Route path="/features" element={<FeaturesPage />} />
          <Route path="/sequences" element={<SequencesPage />} />
 
           <Route path="/connect-email" element={<ConnectAccount />} />

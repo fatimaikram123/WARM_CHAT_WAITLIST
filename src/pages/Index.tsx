@@ -5,7 +5,7 @@ import Hero from '../components/Hero';
 import ProcessVisualization from '../components/ProcessVisualization';
 import HowItWorks from '../components/HowItWorks';
 import Benefits from '../components/Benefits';
-import Features from '../components/Features';
+import FeaturesPage from '../pages/Features';
 import ComparisonTable from '../components/ComparisonTable';
 import Testimonials from '../components/Testimonials';
 import WaitlistCTA from '../components/WaitlistCTA';
@@ -54,7 +54,7 @@ const Index: React.FC = () => {
         <ProcessVisualization />
         {/* <HowItWorks /> */}
         <Benefits />
-        <Features />
+        {/* <Features /> */}
         {/* <ComparisonTabs/> */}
         <ComparisonTable />
         <Testimonials />
