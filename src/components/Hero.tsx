@@ -79,7 +79,7 @@ const Hero: React.FC = () => {
               AI-personalized messages that help teams get up to 3× more replies across email, SMS, and socials.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
+            <div className="flex flex-col sm:flex-row items-center md:justify-start justify-center gap-3 mb-6">
               <input
                 type="email"
                 value={email}
