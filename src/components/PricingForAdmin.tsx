@@ -67,7 +67,7 @@ export default function PricingForAdmin() {
 
   return (
   
-      <section id="pricing" className="py-16 bg-gradient-to-br to-purple-50 min-h-screen">
+      <section id="pricing" className=" bg-gradient-to-br to-purple-50 min-h-screen">
         <div className="max-w-6xl mx-auto text-center mb-12">
           <h1 className="text-4xl font-extrabold text-gray-800 mb-3">
             Choose Your <span className="text-orange-500">WarmChats</span> Plan

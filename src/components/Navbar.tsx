@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const Navbar: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,8 +16,7 @@ const Navbar: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToSection = (sectionId: string, event: React.MouseEvent) => {
-    event.preventDefault();
+  const scrollToSection = (sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
       const navbarHeight = 100;
@@ -28,8 +28,26 @@ const Navbar: React.FC = () => {
         behavior: "smooth"
       });
     }
-    setMobileMenuOpen(false);
   };
+
+  const handleSectionNavigation = (sectionId: string, event?: React.MouseEvent) => {
+    event?.preventDefault();
+    setMobileMenuOpen(false);
+
+    if (location.pathname !== "/") {
+      navigate(`/#${sectionId}`);
+      return;
+    }
+
+    scrollToSection(sectionId);
+  };
+
+  useEffect(() => {
+    if (location.pathname !== "/") return;
+    const hash = location.hash.replace('#', '');
+    if (!hash) return;
+    scrollToSection(hash);
+  }, [location.pathname, location.hash]);
 
   return (
     <nav 
@@ -44,7 +62,7 @@ const Navbar: React.FC = () => {
         <a 
           href="#hero" 
           className="flex items-center gap-2"
-          onClick={(e) => scrollToSection('hero', e)}
+          onClick={(e) => handleSectionNavigation('hero', e)}
         >
           <div className="bg-white p-1.5 md:p-2 rounded-full shadow-sm hover:shadow-md transition-all">
             <img src="/warmchats_icononly.svg" alt="WarmChats" className="w-6 h-6 md:w-7 md:h-7" />
@@ -62,13 +80,13 @@ const Navbar: React.FC = () => {
                 <a  onClick={(e) => navigate("/features")} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white cursor-pointer">
                 Features  
               </a>
-                  <a href="#pricing" onClick={(e) => scrollToSection('pricing', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white cursor-pointer">
+                  <a href="#pricing" onClick={(e) => handleSectionNavigation('pricing', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white cursor-pointer">
                 Pricing
               </a>
-               <a href="#how-it-works" onClick={(e) => scrollToSection('hero', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white cursor-pointer">
+               <a href="#how-it-works" onClick={(e) => handleSectionNavigation('hero', e)} className="px-4 py-2 text-sm text-gray-700 hover:text-warmchats-primary transition-colors rounded-full hover:bg-white cursor-pointer">
                 Get Started
               </a>
-                <a href="#process" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all cursor-pointer" onClick={(e) => scrollToSection('process', e)}>
+                <a href="#process" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all cursor-pointer" onClick={(e) => handleSectionNavigation('process', e)}>
               See It In Action
             </a>
               {/* <a href="#waitlist" onClick={(e) => scrollToSection('waitlist', e)} className="ml-0.5 px-5 py-2 text-sm bg-gradient-to-r from-warmchats-primary to-warmchats-flame text-white rounded-full hover:shadow-md transition-all hover:scale-105">
@@ -102,13 +120,13 @@ const Navbar: React.FC = () => {
                <a className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all" onClick={(e) => navigate("/features")}>
               Features
             </a>
-            <a href="#pricing" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all" onClick={(e) => scrollToSection('pricing', e)}>
+            <a href="#pricing" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all" onClick={(e) => handleSectionNavigation('pricing', e)}>
               Pricing
             </a>
-            <a href="#how-it-works" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all" onClick={(e) => scrollToSection('how-it-works', e)}>
+            <a href="#how-it-works" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all" onClick={(e) => handleSectionNavigation('how-it-works', e)}>
               Get Started
             </a>
-                  <a href="#process" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all" onClick={(e) => scrollToSection('process', e)}>
+                  <a href="#process" className="px-3 py-2 text-sm text-gray-700 rounded-full hover:bg-gray-50 transition-all" onClick={(e) => handleSectionNavigation('process', e)}>
              See It In Action
             </a>
           
