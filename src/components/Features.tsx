@@ -65,7 +65,7 @@ const Features: React.FC = () => {
   ];
 
   return (
-    <section id="features" className="section-padding bg-white relative overflow-hidden">
+    <section id="features" className="section-padding mt-14 bg-white relative overflow-hidden">
       {/* Decorative background elements */}
       <div className="absolute top-20 left-0 w-80 h-80 bg-warmchats-primary-light rounded-full blur-3xl opacity-20 -z-10"></div>
       <div className="absolute bottom-40 right-0 w-96 h-96 bg-warmchats-flame-light rounded-full blur-3xl opacity-20 -z-10"></div>
