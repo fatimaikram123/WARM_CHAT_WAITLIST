@@ -88,7 +88,7 @@ const ComparisonTable: React.FC = () => {
   ];
 
   return (
-    <section id="comparison" className="section-padding bg-white">
+    <section id="comparison" className="py-0 section-padding bg-white" >
       <div className="container mx-auto px-4 md:px-6">
         <h2 className="section-title">Warmchats vs Mailchimp</h2>
         <p className="section-subtitle">
@@ -205,12 +205,15 @@ const ComparisonTable: React.FC = () => {
             </div>
           )}
 
-          <div className="mt-8 text-center">
-            <p className="text-gray-600 mb-4">Experience the WarmChats advantage today</p>
-            <a onClick={() => navigate("/signup")} className="btn-primary inline-block">
-              Join Our Waitlist
-            </a>
-          </div>
+         <div className="mt-16 text-center"> {/* increased from mt-8 to mt-16 */}
+  <p className="text-gray-600  mb-12">Experience the WarmChats advantage today</p>
+  <a
+    onClick={() => navigate("/signup")}
+    className="btn-primary inline-block w-full sm:w-96 md:w-1/2 lg:w-2/5 px-8 py-5 text-xl font-bold rounded-full shadow-xl hover:opacity-90 transition-all"
+  >
+    Join Our Waitlist
+  </a>
+</div>
         </div>
       </div>
     </section>

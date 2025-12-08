@@ -3,7 +3,7 @@ import { Mail, MessageSquare, Sparkle, Play, ArrowRight, Bot, Flame } from 'luci
 
 const ProcessVisualization: React.FC = () => {
   return (
-    <section id="process" className="section-padding bg-gray-50 overflow-hidden">
+    <section id="process" className="pt-16 pb-8 bg-gray-50 overflow-hidden">
       <div className="container mx-auto px-4 md:px-6">
         <h2 className="section-title">How WarmChat Works</h2>
         <p className="section-subtitle mb-12 md:mb-16">
@@ -116,7 +116,8 @@ const ProcessVisualization: React.FC = () => {
 
         {/* Action Button */}
         <div className="text-center mt-12 md:mt-16">
-          <a
+          
+          {/* <a
             href={import.meta.env.VITE_CALENDLY_LINK}
             target="_blank"
             rel="noopener noreferrer"
@@ -124,7 +125,25 @@ const ProcessVisualization: React.FC = () => {
           >
             <span>See how it works</span>
             <ArrowRight size={16} className="md:w-4 md:h-4" />
-          </a>
+          </a> */}
+          {/* <a
+  href={import.meta.env.VITE_CALENDLY_LINK}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-flex items-center gap-2 bg-white border border-warmchats-primary text-warmchats-primary px-6 md:px-8 py-3 md:py-4 rounded-full hover:bg-warmchats-primary hover:text-white transition-colors shadow-sm text-base md:text-lg"
+>
+  <span>See how it works</span>
+  <ArrowRight size={18} className="md:w-5 md:h-5" />
+</a> */}
+<a
+  href={import.meta.env.VITE_CALENDLY_LINK}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-flex items-center justify-center gap-2 bg-white border border-warmchats-primary text-warmchats-primary w-full sm:w-80 md:w-1/3 px-6 py-4 rounded-full hover:bg-warmchats-primary hover:text-white transition-colors shadow-sm text-lg font-semibold"
+>
+  <span>See how it works</span>
+  <ArrowRight size={16} className="md:w-5 md:h-5" />
+</a>
         </div>
       </div>
     </section>
