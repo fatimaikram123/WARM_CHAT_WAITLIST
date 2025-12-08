@@ -206,10 +206,10 @@ const ComparisonTable: React.FC = () => {
           )}
 
          <div className="mt-16 text-center"> {/* increased from mt-8 to mt-16 */}
-  <p className="text-gray-600  mb-12">Experience the WarmChats advantage today</p>
+  <p className="text-gray-600  mb-1">Experience the WarmChats advantage today</p>
   <a
     onClick={() => navigate("/signup")}
-    className="btn-primary inline-block w-full sm:w-96 md:w-1/2 lg:w-2/5 px-8 py-5 text-xl font-bold rounded-full shadow-xl hover:opacity-90 transition-all"
+    className="btn-primary inline-block w-full sm:w-96 md:w-1/2 lg:w-2/5 py-5 text-xl font-bold rounded-full shadow-xl hover:opacity-90 transition-all"
   >
     Join Our Waitlist
   </a>
