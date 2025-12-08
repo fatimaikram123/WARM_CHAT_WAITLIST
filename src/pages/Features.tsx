@@ -8,8 +8,6 @@ import Footer from '@/components/Footer';
 
 const FeaturesPage: React.FC = () => {
   useEffect(() => {
-
-    // Set title for the page
     document.title = "WarmChats - Turn Cold Outreach into Warm Conversations";
   }, []);
 
