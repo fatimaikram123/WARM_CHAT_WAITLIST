@@ -5,6 +5,40 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ▶️ Continuous Flowing Gradient Background */
+.flowing-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: -20;
+}
+
+.flowing-bg::before {
+  content: "";
+  position: absolute;
+  width: 300%;
+  height: 300%;
+  top: -100%;
+  left: -100%;
+  background: radial-gradient(circle at 20% 20%, #a855f7 0%, transparent 60%),
+              radial-gradient(circle at 80% 40%, #fb923c 0%, transparent 60%),
+              radial-gradient(circle at 40% 90%, #6366f1 0%, transparent 60%);
+  filter: blur(160px);
+  opacity: 0.6;
+
+  /* 🔥 Smooth uninterrupted movement */
+  animation: flowMove 30s linear infinite;
+}
+
+@keyframes flowMove {
+  0% {
+    transform: translate(0%, 0%);
+  }
+  100% {
+    transform: translate(30%, -30%);
+  }
+}
+
 
 gptengineer-chat-widget,
 gptengineer-chat-button,
