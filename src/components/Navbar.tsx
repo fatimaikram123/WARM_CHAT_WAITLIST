@@ -64,8 +64,8 @@ const Navbar: React.FC = () => {
           className="flex items-center gap-2"
           onClick={(e) => handleSectionNavigation('hero', e)}
         >
-          <div className="bg-white p-1.5 md:p-2 rounded-full shadow-sm hover:shadow-md transition-all">
-            <img src="/warmchats_icononly.svg" alt="WarmChats" className="w-6 h-6 md:w-7 md:h-7" />
+          <div className="p-1.5 md:p-2 rounded-full hover:shadow-md transition-all">
+            <img src="/warmchats_icononly.svg" alt="WarmChats" className=" w-10 h-10 " />
           </div>
           <span className="text-sm md:text-base font-bold bg-gradient-to-r from-warmchats-primary to-warmchats-flame bg-clip-text text-transparent">
             WarmChats

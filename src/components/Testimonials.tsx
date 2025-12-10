@@ -40,8 +40,8 @@ const Testimonials: React.FC = () => {
   return (
     <section id="testimonials" className="section-padding bg-gray-50">
       <div className="container mx-auto px-4 md:px-6">
-        <h2 className="section-title">Trusted by Industry Leaders</h2>
-        <p className="section-subtitle mb-12 md:mb-16">
+        <h2 data-aos="fade-up" className="section-title">Trusted by Industry Leaders</h2>
+        <p data-aos="fade-up" className="section-subtitle mb-12 md:mb-16">
           See how teams are transforming their outreach with WarmChats
         </p>
         
