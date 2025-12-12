@@ -8,23 +8,44 @@ export default function PipedriveIntegration() {
   const [token, setToken] = useState<string | null>(null);
   const API_BASE = import.meta.env.VITE_API_BASE;
 
-  // Check URL for token after OAuth redirect
+  // ------------------ Handle OAuth token ------------------ //
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const accessToken = params.get("token");
+
     if (accessToken) {
+      // Save token permanently
+      localStorage.setItem("pipedrive_token", accessToken);
+      localStorage.setItem("pipedrive_connected", "true");
+
       setToken(accessToken);
       setConnected(true);
-      localStorage.setItem("pipedrive_connected", "true");
-      // Clean URL
+
+      // Clean URL to remove token
       window.history.replaceState({}, document.title, window.location.pathname);
+    } else {
+      // Load token from localStorage if exists
+      const savedToken = localStorage.getItem("pipedrive_token");
+      const connectedStatus = localStorage.getItem("pipedrive_connected");
+
+      if (savedToken) setToken(savedToken);
+      if (connectedStatus === "true") setConnected(true);
     }
   }, []);
 
+  // ------------------ Helpers ------------------ //
   const handleConnect = () => {
     window.location.href = `${API_BASE}/api/crm/connect-pipedrive`;
   };
 
+  // Append token to any URL
+  const appendToken = (url: string) => {
+    if (!token) return url;
+    const separator = url.includes("?") ? "&" : "?";
+    return `${url}${separator}token=${token}`;
+  };
+
+  // Fetch leads from backend
   const fetchLeads = async () => {
     if (!token) {
       alert("Connect Pipedrive first");
@@ -34,18 +55,30 @@ export default function PipedriveIntegration() {
     const ownerId = 1;
     const orgId = 1;
 
-    const res = await fetch(`${API_BASE}/api/crm/fetch-pipedrive-leads/${ownerId}/${orgId}`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    const data = await res.json();
-    if (data.leads) {
-      setLeads(data.leads);
-      alert("Pipedrive leads imported successfully!");
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/crm/fetch-pipedrive-leads/${ownerId}/${orgId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await res.json();
+      if (data.leads) {
+        setLeads(data.leads);
+        alert("Pipedrive leads imported successfully!");
+      } else {
+        alert(data.error || "No leads found.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error fetching leads from Pipedrive.");
     }
   };
 
+  // ------------------ JSX ------------------ //
   return (
     <MainLayout>
       <div className="p-8">
@@ -74,7 +107,13 @@ export default function PipedriveIntegration() {
           )}
 
           <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <button className="flex items-center justify-center gap-2 border border-gray-300 py-3 rounded-xl hover:bg-gray-50 transition">
+            <button
+              className="flex items-center justify-center gap-2 border border-gray-300 py-3 rounded-xl hover:bg-gray-50 transition"
+              onClick={() => {
+                // Example: Navigate to some URL with token appended
+                window.location.href = appendToken("/sync-deals");
+              }}
+            >
               <Upload className="text-orange-500" /> Sync Deals to Pipedrive
             </button>
 
@@ -82,7 +121,8 @@ export default function PipedriveIntegration() {
               onClick={fetchLeads}
               className="flex items-center justify-center gap-2 border border-gray-300 py-3 rounded-xl hover:bg-gray-50 transition"
             >
-              <Download className="text-orange-500" /> Import Contacts from Pipedrive
+              <Download className="text-orange-500" /> Import Contacts from
+              Pipedrive
             </button>
           </div>
 
