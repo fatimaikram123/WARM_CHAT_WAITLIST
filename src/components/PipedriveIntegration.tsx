@@ -57,7 +57,7 @@ export default function PipedriveIntegration() {
 
     try {
       const res = await fetch(
-        `${API_BASE}/api/crm/fetch-pipedrive-leads/${ownerId}/${orgId}`,
+        `${API_BASE}/api/crm/fetch-pipedrive-leads/${ownerId}/${orgId}?pipedrive_access_token=${token}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
