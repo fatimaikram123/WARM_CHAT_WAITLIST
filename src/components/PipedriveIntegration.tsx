@@ -1,9 +1,50 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import MainLayout from "../components/MainLayout";
 import { Share2, Download, Upload, CheckCircle2 } from "lucide-react";
 
 export default function PipedriveIntegration() {
   const [connected, setConnected] = useState(false);
+  const [leads, setLeads] = useState<any[]>([]);
+  const [token, setToken] = useState<string | null>(null);
+  const API_BASE = import.meta.env.VITE_API_BASE;
+
+  // Check URL for token after OAuth redirect
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const accessToken = params.get("token");
+    if (accessToken) {
+      setToken(accessToken);
+      setConnected(true);
+      localStorage.setItem("pipedrive_connected", "true");
+      // Clean URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
+  const handleConnect = () => {
+    window.location.href = `${API_BASE}/api/crm/connect-pipedrive`;
+  };
+
+  const fetchLeads = async () => {
+    if (!token) {
+      alert("Connect Pipedrive first");
+      return;
+    }
+
+    const ownerId = 1;
+    const orgId = 1;
+
+    const res = await fetch(`${API_BASE}/api/crm/fetch-pipedrive-leads/${ownerId}/${orgId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const data = await res.json();
+    if (data.leads) {
+      setLeads(data.leads);
+      alert("Pipedrive leads imported successfully!");
+    }
+  };
 
   return (
     <MainLayout>
@@ -21,7 +62,7 @@ export default function PipedriveIntegration() {
 
           {!connected ? (
             <button
-              onClick={() => setConnected(true)}
+              onClick={handleConnect}
               className="px-5 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg font-semibold hover:shadow-md transition"
             >
               Connect Pipedrive Account
@@ -36,17 +77,34 @@ export default function PipedriveIntegration() {
             <button className="flex items-center justify-center gap-2 border border-gray-300 py-3 rounded-xl hover:bg-gray-50 transition">
               <Upload className="text-orange-500" /> Sync Deals to Pipedrive
             </button>
-            <button className="flex items-center justify-center gap-2 border border-gray-300 py-3 rounded-xl hover:bg-gray-50 transition">
+
+            <button
+              onClick={fetchLeads}
+              className="flex items-center justify-center gap-2 border border-gray-300 py-3 rounded-xl hover:bg-gray-50 transition"
+            >
               <Download className="text-orange-500" /> Import Contacts from Pipedrive
             </button>
           </div>
 
-          <div className="mt-6">
-            <p className="text-sm text-gray-500">
-              Export leads as <code>CSV</code> anytime or let WarmChats auto-sync
-              your data daily.
-            </p>
-          </div>
+          {leads.length > 0 && (
+            <div className="mt-8">
+              <h2 className="text-lg font-semibold text-gray-800 mb-3">
+                Recently Imported Leads
+              </h2>
+
+              <ul className="space-y-2">
+                {leads.map((lead, i) => (
+                  <li
+                    key={i}
+                    className="p-3 border rounded-lg bg-gray-50 text-gray-700"
+                  >
+                    <strong>{lead.name}</strong> — {lead.email}
+                    {lead.phone ? ` — ${lead.phone}` : ""}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       </div>
     </MainLayout>
