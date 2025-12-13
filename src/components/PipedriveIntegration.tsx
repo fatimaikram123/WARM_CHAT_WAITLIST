@@ -11,16 +11,28 @@ export default function PipedriveIntegration() {
   const ownerId = localStorage.getItem("user_id"); 
   const localToken=localStorage.getItem("token")// Replace with actual owner ID
 
-  useEffect(() => {
-  const checkStatus = async () => {
-    const res = await fetch(
-      `${API_BASE}/api/crm/pipedrive/status/${orgId}`,
-      { headers: { Authorization: `Bearer ${localToken}` } }
-    );
-    const data = await res.json();
-    setConnected(data.connected);
-  };
-  checkStatus();
+useEffect(() => {
+  // Check query param first
+  const params = new URLSearchParams(window.location.search);
+  const connectedParam = params.get("connected");
+
+  if (connectedParam === "true") {
+    setConnected(true);
+
+    // Optionally, clean URL so param doesn't stay
+    window.history.replaceState({}, document.title, window.location.pathname);
+  } else {
+    // If no query param, fallback to API check
+    const checkStatus = async () => {
+      const res = await fetch(
+        `${API_BASE}/api/crm/pipedrive/status/${orgId}`,
+        { headers: { Authorization: `Bearer ${localToken}` } }
+      );
+      const data = await res.json();
+      setConnected(data.connected);
+    };
+    checkStatus();
+  }
 }, []);
 const handleConnect = () => {
   window.location.href =
