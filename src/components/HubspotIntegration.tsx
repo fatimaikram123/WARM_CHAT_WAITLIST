@@ -101,7 +101,7 @@ export default function HubSpotIntegration() {
             </div>
           )}
 
-          <div className="mt-6 flex justify-center">
+          <div className="mt-6 flex justify-content-right">
             <button
               onClick={handleSync}
               className="w-full max-w-xl flex items-center justify-center gap-2 border border-gray-300 py-4 rounded-2xl hover:bg-gray-50 transition"
