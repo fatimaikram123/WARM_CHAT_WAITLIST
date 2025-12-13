@@ -11,101 +11,76 @@ export default function PipedriveIntegration() {
   const ownerId = localStorage.getItem("user_id"); 
   const localToken=localStorage.getItem("token")// Replace with actual owner ID
 
-  // ------------------ Handle OAuth token ------------------ //
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const accessToken = params.get("token");
-
-    if (accessToken) {
-      // Save token permanently
-      localStorage.setItem("pipedrive_token", accessToken);
-      localStorage.setItem("pipedrive_connected", "true");
-
-      setToken(accessToken);
-      setConnected(true);
-
-      // Clean URL to remove token
-      window.history.replaceState({}, document.title, window.location.pathname);
-    } else {
-      // Load token from localStorage if exists
-      const savedToken = localStorage.getItem("pipedrive_token");
-      const connectedStatus = localStorage.getItem("pipedrive_connected");
-
-      if (savedToken) setToken(savedToken);
-      if (connectedStatus === "true") setConnected(true);
-    }
-  }, []);
-
-  // ------------------ Helpers ------------------ //
-  const handleConnect = () => {
-    window.location.href = `${API_BASE}/api/crm/connect-pipedrive`;
+  const checkStatus = async () => {
+    const res = await fetch(
+      `${API_BASE}/api/crm/pipedrive/status/${orgId}`,
+      { headers: { Authorization: `Bearer ${localToken}` } }
+    );
+    const data = await res.json();
+    setConnected(data.connected);
   };
-
-  // Append token to any URL
-  const appendToken = (url: string) => {
-    if (!token) return url;
-    const separator = url.includes("?") ? "&" : "?";
-    return `${url}${separator}token=${token}`;
-  };
-
-  // Fetch leads from backend
-  const fetchLeads = async () => {
-    if (!token) {
-      alert("Connect Pipedrive first");
-      return;
+  checkStatus();
+}, []);
+const handleConnect = () => {
+  window.location.href =
+    `${API_BASE}/api/crm/connect-pipedrive?state=${orgId}`;
+};
+const fetchLeads = async () => {
+  const res = await fetch(
+    `${API_BASE}/api/crm/fetch-pipedrive-leads/${ownerId}/${orgId}`,
+    {
+      headers: { Authorization: `Bearer ${localToken}` },
     }
+  );
 
-   
+  const data = await res.json();
+  setLeads(data.leads || []);
+};
+  // ------------------ Handle OAuth token ------------------ //
+  // useEffect(() => {
+  //   const params = new URLSearchParams(window.location.search);
+  //   const accessToken = params.get("token");
 
-    try {
-      const res = await fetch(
-        `${API_BASE}/api/crm/fetch-pipedrive-leads/${ownerId}/${orgId}?pipedrive_access_token=${token}`,
-        {
-          headers: {
-            Authorization: `Bearer ${localToken}`,
-          },
-        }
-      );
+  //   if (accessToken) {
+  //     // Save token permanently
+  //     localStorage.setItem("pipedrive_token", accessToken);
+  //     localStorage.setItem("pipedrive_connected", "true");
 
-      const data = await res.json();
-      if (data.leads) {
-        setLeads(data.leads);
-        alert("Pipedrive leads imported successfully!");
-      } else {
-        alert(data.error || "No leads found.");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Error fetching leads from Pipedrive.");
-    }
-  };
-    const fetchContacts = async () => {
-    if (!token) {
-      alert("Connect Pipedrive first");
-      return;
-    }
-    try {
-      const res = await fetch(
-        `${API_BASE}/api/crm/fetch-pipedrive-contacts/${ownerId}/${orgId}?pipedrive_access_token=${token}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+  //     setToken(accessToken);
+  //     setConnected(true);
 
-      const data = await res.json();
-      if (data.leads) {
-        setLeads(data.leads);
-        alert("Pipedrive leads imported successfully!");
-      } else {
-        alert(data.error || "No leads found.");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Error fetching leads from Pipedrive.");
-    }
-  };
+  //     // Clean URL to remove token
+  //     window.history.replaceState({}, document.title, window.location.pathname);
+  //   } else {
+  //     // Load token from localStorage if exists
+  //     const savedToken = localStorage.getItem("pipedrive_token");
+  //     const connectedStatus = localStorage.getItem("pipedrive_connected");
+
+  //     if (savedToken) setToken(savedToken);
+  //     if (connectedStatus === "true") setConnected(true);
+  //   }
+  // }, []);
+
+  // // ------------------ Helpers ------------------ //
+  // const handleConnect = () => {
+  //   window.location.href = `${API_BASE}/api/crm/connect-pipedrive`;
+  // };
+
+  // // Append token to any URL
+  // const appendToken = (url: string) => {
+  //   if (!token) return url;
+  //   const separator = url.includes("?") ? "&" : "?";
+  //   return `${url}${separator}token=${token}`;
+  // };
+
+  // // Fetch leads from backend
+  // const fetchLeads = async () => {
+  //   if (!token) {
+  //     alert("Connect Pipedrive first");
+  //     return;
+  //   }
+
 
   // ------------------ JSX ------------------ //
   return (
@@ -147,13 +122,13 @@ export default function PipedriveIntegration() {
               <Upload className="text-orange-500" /> Sync Leads to Pipedrive
             </button>
 
-            <button
+            {/* <button
               onClick={fetchContacts}
               className="flex items-center justify-center gap-2 border border-gray-300 py-3 rounded-xl hover:bg-gray-50 transition"
             >
               <Download className="text-orange-500" /> Sync Contacts from
               Pipedrive
-            </button>
+            </button> */}
           </div>
 
           {leads.length > 0 && (
