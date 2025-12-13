@@ -3,79 +3,77 @@ import MainLayout from "../components/MainLayout";
 import { Share2, Download, Upload, CheckCircle2 } from "lucide-react";
 
 export default function PipedriveIntegration() {
-  const [connected, setConnected] = useState(false);
-  const [leads, setLeads] = useState<any[]>([]);
-  const [token, setToken] = useState<string | null>(null);
   const API_BASE = import.meta.env.VITE_API_BASE;
-  const orgId = localStorage.getItem("org_id"); // Replace with actual org ID
-  const ownerId = localStorage.getItem("user_id"); // Replace with actual owner ID
 
-  // ------------------ Handle OAuth token ------------------ //
+  // 🔐 TOKENS (SEPARATED)
+  const appToken = localStorage.getItem("token"); // YOUR backend auth
+  const [pipedriveToken, setPipedriveToken] = useState<string | null>(null);
+
+  const [connected, setConnected] = useState(false);
+  const [items, setItems] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const orgId = localStorage.getItem("org_id");
+  const ownerId = localStorage.getItem("user_id");
+
+  // ------------------ Handle Pipedrive OAuth ------------------ //
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const accessToken = params.get("token");
+    const oauthToken = params.get("token");
 
-    if (accessToken) {
-      // Save token permanently
-      localStorage.setItem("pipedrive_token", accessToken);
+    if (oauthToken) {
+      localStorage.setItem("pipedrive_token", oauthToken);
       localStorage.setItem("pipedrive_connected", "true");
 
-      setToken(accessToken);
+      setPipedriveToken(oauthToken);
       setConnected(true);
 
-      // Clean URL to remove token
       window.history.replaceState({}, document.title, window.location.pathname);
-    } else {
-      // Load token from localStorage if exists
-      const savedToken = localStorage.getItem("pipedrive_token");
-      const connectedStatus = localStorage.getItem("pipedrive_connected");
+      return;
+    }
 
-      if (savedToken) setToken(savedToken);
-      if (connectedStatus === "true") setConnected(true);
+    const saved = localStorage.getItem("pipedrive_token");
+    if (saved) {
+      setPipedriveToken(saved);
+      setConnected(true);
     }
   }, []);
 
-  // ------------------ Helpers ------------------ //
+  // ------------------ Connect OAuth ------------------ //
   const handleConnect = () => {
     window.location.href = `${API_BASE}/api/crm/connect-pipedrive`;
   };
 
-  // Append token to any URL
-  const appendToken = (url: string) => {
-    if (!token) return url;
-    const separator = url.includes("?") ? "&" : "?";
-    return `${url}${separator}token=${token}`;
-  };
-
-  // Fetch leads from backend
-  const fetchLeads = async () => {
-    if (!token) {
+  // ------------------ Import ------------------ //
+  const importFromPipedrive = async (type: "leads" | "contacts") => {
+    if (!connected) {
       alert("Connect Pipedrive first");
       return;
     }
 
-   
+    setLoading(true);
+    setItems([]);
 
     try {
       const res = await fetch(
-        `${API_BASE}/api/crm/fetch-pipedrive-leads/${ownerId}/${orgId}?pipedrive_access_token=${token}`,
+        `${API_BASE}/api/crm/fetch-pipedrive-${type}/${ownerId}/${orgId}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            // 🔐 YOUR BACKEND AUTH ONLY
+            Authorization: `Bearer ${appToken}`,
           },
         }
       );
 
       const data = await res.json();
-      if (data.leads) {
-        setLeads(data.leads);
-        alert("Pipedrive leads imported successfully!");
-      } else {
-        alert(data.error || "No leads found.");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Error fetching leads from Pipedrive.");
+      if (!res.ok) throw new Error(data.error || "Import failed");
+
+      setItems(data[type]);
+      alert(`Pipedrive ${type} imported successfully`);
+    } catch (err: any) {
+      alert(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -83,68 +81,57 @@ export default function PipedriveIntegration() {
   return (
     <MainLayout>
       <div className="p-8">
-        <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2 mb-6">
+        <h1 className="text-2xl font-bold flex items-center gap-2 mb-6">
           <Share2 className="text-orange-500" /> Pipedrive Integration
         </h1>
 
         <div className="bg-white rounded-2xl shadow-sm p-6">
-          <p className="text-gray-700 mb-4 leading-relaxed">
-            Integrate with <strong>Pipedrive</strong> for effortless lead and
-            deal synchronization. Keep campaigns, engagement metrics, and
-            contacts fully aligned with your sales pipeline.
-          </p>
-
           {!connected ? (
             <button
               onClick={handleConnect}
-              className="px-5 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg font-semibold hover:shadow-md transition"
+              className="px-5 py-2 bg-orange-500 text-white rounded-lg font-semibold"
             >
               Connect Pipedrive Account
             </button>
           ) : (
-            <div className="flex items-center gap-3 text-green-600 font-medium mt-2">
-              <CheckCircle2 /> Connected to Pipedrive Successfully!
+            <div className="flex items-center gap-2 text-green-600">
+              <CheckCircle2 /> Pipedrive Connected
             </div>
           )}
 
-          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <button
-              className="flex items-center justify-center gap-2 border border-gray-300 py-3 rounded-xl hover:bg-gray-50 transition"
-              onClick={() => {
-                // Example: Navigate to some URL with token appended
-                window.location.href = appendToken("/sync-deals");
-              }}
-            >
-              <Upload className="text-orange-500" /> Sync Deals to Pipedrive
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <button className="border py-3 rounded-xl">
+              <Upload className="inline mr-2 text-orange-500" />
+              Sync Deals
             </button>
 
             <button
-              onClick={fetchLeads}
-              className="flex items-center justify-center gap-2 border border-gray-300 py-3 rounded-xl hover:bg-gray-50 transition"
+              disabled={loading}
+              onClick={() => importFromPipedrive("contacts")}
+              className="border py-3 rounded-xl"
             >
-              <Download className="text-orange-500" /> Import Contacts from
-              Pipedrive
+              <Download className="inline mr-2 text-orange-500" />
+              Import Contacts
+            </button>
+
+            <button
+              disabled={loading}
+              onClick={() => importFromPipedrive("leads")}
+              className="border py-3 rounded-xl"
+            >
+              <Download className="inline mr-2 text-orange-500" />
+              Import Leads
             </button>
           </div>
 
-          {leads.length > 0 && (
-            <div className="mt-8">
-              <h2 className="text-lg font-semibold text-gray-800 mb-3">
-                Recently Imported Leads
-              </h2>
-
-              <ul className="space-y-2">
-                {leads.map((lead, i) => (
-                  <li
-                    key={i}
-                    className="p-3 border rounded-lg bg-gray-50 text-gray-700"
-                  >
-                    <strong>{lead.name}</strong> — {lead.email}
-                    {lead.phone ? ` — ${lead.phone}` : ""}
-                  </li>
-                ))}
-              </ul>
-            </div>
+          {items.length > 0 && (
+            <ul className="mt-6 space-y-2">
+              {items.map((i, idx) => (
+                <li key={idx} className="p-3 border rounded bg-gray-50">
+                  <strong>{i.name}</strong> — {i.email}
+                </li>
+              ))}
+            </ul>
           )}
         </div>
       </div>
