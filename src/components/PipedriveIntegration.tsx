@@ -7,6 +7,8 @@ export default function PipedriveIntegration() {
   const [leads, setLeads] = useState<any[]>([]);
   const [token, setToken] = useState<string | null>(null);
   const API_BASE = import.meta.env.VITE_API_BASE;
+  const orgId = localStorage.getItem("org_id"); // Replace with actual org ID
+  const ownerId = localStorage.getItem("user_id"); // Replace with actual owner ID
 
   // ------------------ Handle OAuth token ------------------ //
   useEffect(() => {
@@ -52,8 +54,7 @@ export default function PipedriveIntegration() {
       return;
     }
 
-    const ownerId = 1;
-    const orgId = 1;
+   
 
     try {
       const res = await fetch(
