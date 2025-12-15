@@ -12,6 +12,24 @@ const Login: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+      localStorage.removeItem("token_exp");
+      localStorage.removeItem("token");
+      localStorage.removeItem("user_id");
+      localStorage.removeItem("name");
+      localStorage.removeItem("role_id");
+      localStorage.removeItem("role_name");
+      localStorage.removeItem("org_id");
+      localStorage.removeItem("gmail_user_name");
+      localStorage.removeItem("org_name");
+      localStorage.removeItem("gmail_email_id")
+      localStorage.removeItem("token");
+      localStorage.removeItem("role_id");
+      localStorage.removeItem("email");
+      localStorage.removeItem("session")
+      localStorage.removeItem("pipedrive_token");
+      localStorage.removeItem("pipedrive_connected");
+
+
 
     try {
       const response = await fetch(`${API_BASE}/api/auth/login`, {
@@ -29,8 +47,6 @@ const Login: React.FC = () => {
       }
       const decoded = JSON.parse(atob(data.access_token.split(".")[1]));
       localStorage.setItem("token_exp", (decoded.exp * 1000).toString());
-
-      // ✅ Save token and user info
       localStorage.setItem("token", data.access_token);
       localStorage.setItem("user_id", JSON.stringify(data.user_id));
       localStorage.setItem("name", data.name);

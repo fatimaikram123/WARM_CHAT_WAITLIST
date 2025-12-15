@@ -1,150 +1,182 @@
 import React, { useState, useEffect } from "react";
 import MainLayout from "../components/MainLayout";
-import { Share2, Download, Upload, CheckCircle2 } from "lucide-react";
+import {
+  Share2,
+  Upload,
+  CheckCircle2,
+  LogOut,
+  Loader2,
+} from "lucide-react";
+import toast,{Toaster} from "react-hot-toast";
 
 export default function PipedriveIntegration() {
   const [connected, setConnected] = useState(false);
   const [leads, setLeads] = useState<any[]>([]);
-  const [token, setToken] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  // 🔹 dialog + disconnect loading
+  const [showDisconnectDialog, setShowDisconnectDialog] = useState(false);
+  const [disconnecting, setDisconnecting] = useState(false);
+
   const API_BASE = import.meta.env.VITE_API_BASE;
-  const orgId = localStorage.getItem("org_id"); // Replace with actual org ID
-  const ownerId = localStorage.getItem("user_id"); 
-  const localToken=localStorage.getItem("token")// Replace with actual owner ID
+  const orgId = localStorage.getItem("org_id");
+  const ownerId = localStorage.getItem("user_id");
+  const authToken = localStorage.getItem("token");
 
-useEffect(() => {
-  // Check query param first
-  const params = new URLSearchParams(window.location.search);
-  const connectedParam = params.get("connected");
-
-  if (connectedParam === "true") {
-    setConnected(true);
-
-    // Optionally, clean URL so param doesn't stay
-    window.history.replaceState({}, document.title, window.location.pathname);
-  } else {
-    // If no query param, fallback to API check
-    const checkStatus = async () => {
+  // ---------------- Check connection ----------------
+  const checkStatus = async () => {
+    try {
       const res = await fetch(
         `${API_BASE}/api/crm/pipedrive/status/${orgId}`,
-        { headers: { Authorization: `Bearer ${localToken}` } }
+        { headers: { Authorization: `Bearer ${authToken}` } }
       );
       const data = await res.json();
       setConnected(data.connected);
-    };
-    checkStatus();
-  }
-}, []);
-const handleConnect = () => {
-  window.location.href =
-    `${API_BASE}/api/crm/connect-pipedrive?state=${orgId}`;
-};
-const fetchLeads = async () => {
-  const res = await fetch(
-    `${API_BASE}/api/crm/fetch-pipedrive-leads/${ownerId}/${orgId}`,
-    {
-      headers: { Authorization: `Bearer ${localToken}` },
+    } catch {
+      setConnected(false);
     }
-  );
+  };
 
-  const data = await res.json();
-  setLeads(data.leads || []);
-};
-  // ------------------ Handle OAuth token ------------------ //
-  // useEffect(() => {
-  //   const params = new URLSearchParams(window.location.search);
-  //   const accessToken = params.get("token");
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("connected") === "true") {
+      toast.success("Pipedrive connected successfully");
+      setConnected(true);
+      window.history.replaceState({}, document.title, window.location.pathname);
+    } else {
+      checkStatus();
+    }
+  }, []);
 
-  //   if (accessToken) {
-  //     // Save token permanently
-  //     localStorage.setItem("pipedrive_token", accessToken);
-  //     localStorage.setItem("pipedrive_connected", "true");
+  // ---------------- Connect ----------------
+  const handleConnect = () => {
+    window.location.href = `${API_BASE}/api/crm/connect-pipedrive?state=${orgId}`;
+  };
 
-  //     setToken(accessToken);
-  //     setConnected(true);
+  // ---------------- Disconnect ----------------
+  const handleDisconnect = async () => {
+    try {
+      setDisconnecting(true);
 
-  //     // Clean URL to remove token
-  //     window.history.replaceState({}, document.title, window.location.pathname);
-  //   } else {
-  //     // Load token from localStorage if exists
-  //     const savedToken = localStorage.getItem("pipedrive_token");
-  //     const connectedStatus = localStorage.getItem("pipedrive_connected");
+      await fetch(
+        `${API_BASE}/api/crm/disconnect-pipedrive/${orgId}`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${authToken}` },
+        }
+      );
 
-  //     if (savedToken) setToken(savedToken);
-  //     if (connectedStatus === "true") setConnected(true);
-  //   }
-  // }, []);
+      setConnected(false);
+      setLeads([]);
+      setShowDisconnectDialog(false);
+      toast.success("Pipedrive disconnected successfully");
+    } catch {
+      toast.error("Failed to disconnect Pipedrive");
+    } finally {
+      setDisconnecting(false);
+    }
+  };
 
-  // // ------------------ Helpers ------------------ //
-  // const handleConnect = () => {
-  //   window.location.href = `${API_BASE}/api/crm/connect-pipedrive`;
-  // };
+  // ---------------- Sync Leads ----------------
+  const fetchLeads = async () => {
+    if (!connected) {
+      toast.error("Please connect Pipedrive first");
+      return;
+    }
 
-  // // Append token to any URL
-  // const appendToken = (url: string) => {
-  //   if (!token) return url;
-  //   const separator = url.includes("?") ? "&" : "?";
-  //   return `${url}${separator}token=${token}`;
-  // };
+    setLoading(true);
+    setLeads([]);
 
-  // // Fetch leads from backend
-  // const fetchLeads = async () => {
-  //   if (!token) {
-  //     alert("Connect Pipedrive first");
-  //     return;
-  //   }
+    try {
+      const res = await fetch(
+        `${API_BASE}/api/crm/fetch-pipedrive-leads/${ownerId}/${orgId}`,
+        { headers: { Authorization: `Bearer ${authToken}` } }
+      );
 
+      if (!res.ok) {
+        toast.error("Failed to sync Pipedrive leads");
+        return;
+      }
 
-  // ------------------ JSX ------------------ //
+      const data = await res.json();
+      setLeads(data.leads || []);
+
+      if ((data.leads || []).length > 0) {
+        toast.success(`${data.leads.length} Pipedrive leads imported`);
+      } else {
+       toast.success("No new leads found from Pipedrive.");
+      }
+    } catch {
+      toast.error("Error syncing leads");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <MainLayout>
       <div className="p-8">
+          <Toaster position="top-right" />
         <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2 mb-6">
           <Share2 className="text-orange-500" /> Pipedrive Integration
         </h1>
 
         <div className="bg-white rounded-2xl shadow-sm p-6">
-          <p className="text-gray-700 mb-4 leading-relaxed">
-            Integrate with <strong>Pipedrive</strong> for effortless lead and
-            deal synchronization. Keep campaigns, engagement metrics, and
-            contacts fully aligned with your sales pipeline.
+          <p className="text-gray-700 mb-6 leading-relaxed">
+            Integrate with <strong>Pipedrive</strong> for effortless lead
+            synchronization.
           </p>
 
           {!connected ? (
             <button
               onClick={handleConnect}
-              className="px-5 py-2 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg font-semibold hover:shadow-md transition"
+              className="px-6 py-3 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-xl font-semibold hover:shadow-md transition"
             >
               Connect Pipedrive Account
             </button>
           ) : (
-            <div className="flex items-center gap-3 text-green-600 font-medium mt-2">
-              <CheckCircle2 /> Connected to Pipedrive Successfully!
+            <div className="flex items-center justify-between flex-wrap gap-4 mb-4">
+              <div className="flex items-center gap-2 text-green-600 font-medium">
+                <CheckCircle2 /> Connected to Pipedrive
+              </div>
+
+              <button
+                onClick={() => setShowDisconnectDialog(true)}
+                className="flex items-center gap-2 px-4 py-2 border border-red-400 text-red-600 rounded-xl hover:bg-red-50 transition"
+              >
+                <LogOut size={18} />
+                Disconnect
+              </button>
             </div>
           )}
 
-          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="mt-6 flex ">
             <button
-              className="flex items-center justify-center gap-2 border border-gray-300 py-3 rounded-xl hover:bg-gray-50 transition"
-              // onClick={() => {
-              //   // Example: Navigate to some URL with token appended
-              //   window.location.href = appendToken("/sync-deals");
-              // }}
               onClick={fetchLeads}
+              disabled={!connected || loading}
+              className={`w-full max-w-xl flex items-center justify-center gap-2 py-4 rounded-2xl transition
+                ${
+                  loading
+                    ? "bg-gray-200 cursor-not-allowed"
+                    : "border border-gray-300 hover:bg-gray-50"
+                }`}
             >
-              <Upload className="text-orange-500" /> Sync Leads to Pipedrive
+              {loading ? (
+                <>
+                  <Loader2 className="animate-spin text-orange-500" />
+                  Syncing Pipedrive Leads...
+                </>
+              ) : (
+                <>
+                  <Upload className="text-orange-500" />
+                  Sync Leads from Pipedrive
+                </>
+              )}
             </button>
-
-            {/* <button
-              onClick={fetchContacts}
-              className="flex items-center justify-center gap-2 border border-gray-300 py-3 rounded-xl hover:bg-gray-50 transition"
-            >
-              <Download className="text-orange-500" /> Sync Contacts from
-              Pipedrive
-            </button> */}
           </div>
 
           {leads.length > 0 && (
-            <div className="mt-8">
+            <div className="mt-10">
               <h2 className="text-lg font-semibold text-gray-800 mb-3">
                 Recently Imported Leads
               </h2>
@@ -156,14 +188,54 @@ const fetchLeads = async () => {
                     className="p-3 border rounded-lg bg-gray-50 text-gray-700"
                   >
                     <strong>{lead.name}</strong> — {lead.email}
-                    {lead.phone ? ` — ${lead.phone}` : ""}
+                    {lead.phone && ` — ${lead.phone}`}
                   </li>
                 ))}
               </ul>
             </div>
           )}
+
+          {!loading && connected && leads.length === 0 && (
+            <p className="mt-6 text-sm text-gray-500 text-center">
+              No leads imported yet. Click “Sync Leads from Pipedrive”.
+            </p>
+          )}
         </div>
       </div>
+
+      {/* ================= Disconnect Confirmation Dialog ================= */}
+      {showDisconnectDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl">
+            <h3 className="text-lg font-semibold text-gray-800 mb-2">
+              Disconnect Pipedrive
+            </h3>
+
+            <p className="text-sm text-gray-600 mb-6">
+              Are you sure you want to disconnect Pipedrive?  
+              This will stop syncing leads until you reconnect.
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowDisconnectDialog(false)}
+                disabled={disconnecting}
+                className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleDisconnect}
+                disabled={disconnecting}
+                className="px-4 py-2 rounded-lg bg-red-600 text-white hover:bg-red-700 disabled:opacity-60"
+              >
+                {disconnecting ? "Disconnecting..." : "Disconnect"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </MainLayout>
   );
 }

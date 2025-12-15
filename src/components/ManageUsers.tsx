@@ -64,7 +64,7 @@ const ManageUsers: React.FC = () => {
 
   const fetchOrgs = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/orgs/all`, { // assuming you have /orgs endpoint
+      const res = await fetch(`${API_BASE}/api/orgs/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Failed to fetch organizations");
@@ -119,7 +119,7 @@ const ManageUsers: React.FC = () => {
 
   return (
     <MainLayout>
-      <div className="min-h-screen p-8 bg-gradient-to-br">
+      <div className="min-h-screen p-4 sm:p-8 bg-gradient-to-br">
         <div className="max-w-4xl mx-auto bg-white shadow-lg rounded-xl p-6">
           <h2 className="text-2xl font-bold text-gray-800 mb-4">Manage Users 👥</h2>
 
@@ -138,51 +138,102 @@ const ManageUsers: React.FC = () => {
           {loading ? (
             <p>Loading users...</p>
           ) : (
-            <table className="w-full border border-gray-200 rounded-lg">
-              <thead>
-                <tr className="bg-orange-100 text-left">
-                  <th className="p-3">Name</th>
-                  <th className="p-3">Email</th>
-                  <th className="p-3">Role</th>
-                  <th className="p-3">Organization</th>
-                  <th className="p-3">Action</th>
-                </tr>
-              </thead>
-              <tbody>
+            <>
+              {/* Table for large screens */}
+              <div className="hidden lg:block overflow-x-auto">
+                <table className="min-w-[700px] border border-gray-200 rounded-lg table-auto">
+                  <thead>
+                    <tr className="bg-orange-100 text-left">
+                      <th className="p-3">Name</th>
+                      <th className="p-3">Email</th>
+                      <th className="p-3">Role</th>
+                      <th className="p-3">Organization</th>
+                      <th className="p-3">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.map((user) => (
+                      <tr key={user.id} className="border-t">
+                        <td className="p-3">{user.name}</td>
+                        <td className="p-3">{user.email}</td>
+                        <td className="p-3">
+                          <select
+                            value={user.role}
+                            onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                            className="border border-gray-300 rounded px-2 py-1 w-full text-sm"
+                          >
+                            {roles.map((r) => (
+                              <option key={r.id} value={r.name}>
+                                {r.name}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className="p-3">
+                          <select
+                            value={user.org_id}
+                            onChange={(e) => handleOrgChange(user.id, Number(e.target.value))}
+                            className="border border-gray-300 rounded px-2 py-1 w-full text-sm"
+                          >
+                            {orgs.map((o) => (
+                              <option key={o.id} value={o.id}>
+                                {o.name}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className="p-3 text-gray-500 text-sm">Select role/org above</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Card layout for small screens */}
+              <div className="lg:hidden space-y-4">
                 {users.map((user) => (
-                  <tr key={user.id} className="border-t">
-                    <td className="p-3">{user.name}</td>
-                    <td className="p-3">{user.email}</td>
-                    <td className="p-3">
+                  <div key={user.id} className="bg-white rounded-lg shadow p-4 border border-gray-200">
+                    <div className="flex flex-col gap-2 mb-2">
+                      <span className="font-semibold text-gray-700">Name:</span>
+                      <span>{user.name}</span>
+                    </div>
+                    <div className="flex flex-col gap-2 mb-2">
+                      <span className="font-semibold text-gray-700">Email:</span>
+                      <span>{user.email}</span>
+                    </div>
+                    <div className="flex flex-col gap-2 mb-2">
+                      <span className="font-semibold text-gray-700">Role:</span>
                       <select
                         value={user.role}
                         onChange={(e) => handleRoleChange(user.id, e.target.value)}
-                        className="border border-gray-300 rounded px-2 py-1 text-sm"
+                        className="border border-gray-300 rounded px-2 py-1 w-full text-sm"
                       >
                         {roles.map((r) => (
-                          <option key={r.id} value={r.name}>{r.name}</option>
+                          <option key={r.id} value={r.name}>
+                            {r.name}
+                          </option>
                         ))}
                       </select>
-                    </td>
-                    <td className="p-3">
+                    </div>
+                    <div className="flex flex-col gap-2 mb-2">
+                      <span className="font-semibold text-gray-700">Organization:</span>
                       <select
                         value={user.org_id}
                         onChange={(e) => handleOrgChange(user.id, Number(e.target.value))}
-                        className="border border-gray-300 rounded px-2 py-1 text-sm"
+                        className="border border-gray-300 rounded px-2 py-1 w-full text-sm"
                       >
                         {orgs.map((o) => (
-                          <option key={o.id} value={o.id}>{o.name}</option>
+                          <option key={o.id} value={o.id}>
+                            {o.name}
+                          </option>
                         ))}
                       </select>
-                    </td>
-                    <td className="p-3">
-                      {/* Optionally add other actions like delete */}
-                      <span className="text-gray-500 text-sm">Select role/org above</span>
-                    </td>
-                  </tr>
+                    </div>
+                    <div className="text-gray-500 text-sm mt-2">Select role/org above</div>
+                  </div>
                 ))}
-              </tbody>
-            </table>
+              </div>
+            </>
           )}
         </div>
       </div>
