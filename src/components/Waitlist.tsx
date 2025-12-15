@@ -10,14 +10,45 @@ const Waitlist: React.FC = () => {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [message, setMessage] = useState<{ text: string; type: "success" | "error" } | null>(null);
+  const scriptURL = import.meta.env.VITE_API_SCRIPT_URL;
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Fake submit
-    setTimeout(() => {
-      setSubmitted(true);
-    }, 800);
-  };
+  // const handleSubmit = (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   // Fake submit
+  //   setTimeout(() => {
+  //     setSubmitted(true);
+  //   }, 800);
+  // };
+  
+  
+  
+    const handleSubmit = async () => {
+      if (!email) {
+        setMessage({ text: "Please enter your email.", type: "error" });
+        return;
+      }
+  
+      try {
+        let successMessage = "";
+       successMessage = "🎉 You're on the waitlist!";
+        setMessage({ text: successMessage, type: "success" });
+  
+        const data = { email, Lead: "waitlist" };
+        await fetch(scriptURL, {
+          method: "POST",
+          mode: "no-cors",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+  
+        setEmail("");
+        setSubmitted(true);
+      } catch (error) {
+        setMessage({ text: "Something went wrong. Try again later.", type: "error" });
+      }
+    };
+  
 
   return (
     <MainLayout> 
@@ -42,7 +73,7 @@ const Waitlist: React.FC = () => {
               <h2 className="text-xl font-semibold text-gray-800 mb-6 text-center">
                 Join our early access community 💬
               </h2>
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <div  className="space-y-5">
                 <div>
                   <label className="block text-gray-700 text-sm mb-1">Full Name</label>
                   <div className="relative">
@@ -74,12 +105,13 @@ const Waitlist: React.FC = () => {
                 </div>
 
                 <button
-                  type="submit"
+              
                   className="w-full py-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:scale-[1.02] transition"
+                    onClick={() => handleSubmit()}
                 >
                   Join Waitlist
                 </button>
-              </form>
+              </div>
             </>
           ) : (
             <div className="text-center py-10">

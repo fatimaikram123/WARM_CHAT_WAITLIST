@@ -41,8 +41,8 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
     localStorage.removeItem("email");
     localStorage.removeItem("org_name");
     localStorage.removeItem("session")
-      localStorage.removeItem("pipedrive_token");
-      localStorage.removeItem("pipedrive_connected");
+    localStorage.removeItem("pipedrive_token");
+    localStorage.removeItem("pipedrive_connected");
 
 
     navigate("/login");

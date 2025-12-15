@@ -39,6 +39,7 @@ import Sidebar from "./components/SideBar";
 import LeadThreadPage from "./components/LeadThreadPage";
 import SequencesPage from "./components/SequencesPage";
 import FeaturesPage from "./pages/Features";
+import Help from "./components/Help";
 const queryClient = new QueryClient();
 
 const App: React.FC = () => {
@@ -111,6 +112,7 @@ const App: React.FC = () => {
           <Route path="/waitlist" element={<Waitlist />} />
           <Route path="/features" element={<FeaturesPage />} />
          <Route path="/sequences" element={<SequencesPage />} />
+         
 
           <Route path="/connect-email" element={<ConnectAccount />} />
 
@@ -126,6 +128,16 @@ const App: React.FC = () => {
               </RoleProtectedRoute>
             }
           />
+          
+          <Route
+            path="/help"
+            element={
+              <RoleProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.MANAGER, ROLES.AGENT,ROLES.GUEST]}>
+                <Help />
+              </RoleProtectedRoute>
+            }
+          />
+
 
           <Route
             path="/leads"
