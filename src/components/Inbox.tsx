@@ -16,6 +16,9 @@ export default function Inbox() {
   const userId = localStorage.getItem("user_id");
   const token = localStorage.getItem("token");
   const org_id = localStorage.getItem("org_id");
+  const [selectedLeadEmails, setSelectedLeadEmails] = useState<string[]>([]);
+  const [selectedLeadIds, setSelectedLeadIds] = useState<number[]>([]);
+  
 
   const [messages, setMessages] = useState([]);
   const [activeTab, setActiveTab] = useState("All");
@@ -24,6 +27,9 @@ export default function Inbox() {
   const [selected, setSelected] = useState(null);
   const [reply, setReply] = useState("");
   const [isSyncing, setIsSyncing] = useState(false);
+    const [tones, setTones] = useState([]);
+    const [personas, setPersonas] = useState([]);
+  
 
   // ⬇️ Pagination States
   const [page, setPage] = useState(1);
@@ -31,6 +37,11 @@ export default function Inbox() {
   const [totalPages, setTotalPages] = useState(1);
 
   const navigate = useNavigate();
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
+
 
   // -------------------------------
   // Fire-and-forget /fetch API background
@@ -44,8 +55,9 @@ export default function Inbox() {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-            "X-Timezone": Intl.DateTimeFormat().resolvedOptions().timeZone,
+            Authorization: `Bearer ${token}`
+        
+
           },
         }
       )
@@ -121,6 +133,7 @@ export default function Inbox() {
     const interval = setInterval(() => {
       console.log("Auto refresh running: fetching all inbox pages...");
       backgroundFetchAllPages();
+      fetchEmails()
     }, 30000); // 30 seconds
 
     return () => clearInterval(interval);
@@ -140,6 +153,38 @@ export default function Inbox() {
           if (activeTab === "SMS") return m.channel?.toLowerCase() === "sms";
           return true;
         });
+
+         const handleCheckboxChange = (email: string, id: number) => {
+            setSelectedLeadEmails((prev) =>
+              prev.includes(email) ? prev.filter((e) => e !== email) : [...prev, email]
+            );
+            setSelectedLeadIds((prev) =>
+              prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+            );
+          };
+          
+            const fetchAll = async () => {
+              try {
+                const [
+                
+                  toneRes,
+                  personaRes,
+                ] = await Promise.all([
+              
+                  fetch(`${API_BASE}/api/ai/tones`, { headers }).then(r => r.json()),
+                  fetch(`${API_BASE}/api/ai/personas`, { headers }).then(r => r.json()),
+                ]);
+          
+                setTones(toneRes);
+                setPersonas(personaRes);
+              } catch (e) {
+                console.error(e);
+              }
+            };
+          
+            useEffect(() => {
+              fetchAll();
+            }, []);
 
   // ⬇️ Send reply
   const handleSend = async () => {

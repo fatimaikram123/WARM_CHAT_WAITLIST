@@ -103,8 +103,8 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
               {canView([
                 ROLES.ADMIN,
                 ROLES.MANAGER,
-                ROLES.AGENT,
-                ROLES.GUEST,
+                ROLES.AGENT
+               
               ]) && (
                 <li>
                   <NavLink
@@ -143,14 +143,7 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                     </NavLink>
                   </li>
                   <li>
-                    <NavLink
-                      to="/ai-writer"
-                      className={({ isActive }) =>
-                        isActive ? activeLink : normalLink
-                      }
-                    >
-                      🧠 AI Message Writer
-                    </NavLink>
+                   
                   </li>
                   <li>
                     <NavLink
@@ -214,6 +207,41 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
               )}
             </ul>
           </li>
+             <li>
+    <div className="flex items-center justify-between px-2 mb-2">
+      <span className="text-lg font-semibold text-gray-700">Message Generator</span>
+      <ChevronDown className="w-4 h-4 text-gray-500" />
+    </div>
+
+    <ul className="ml-3 space-y-2 border-l-2 border-orange-100 pl-3">
+      {canView([ROLES.ADMIN, ROLES.MANAGER, ROLES.AGENT, ROLES.GUEST]) && (
+       
+        <div>
+          <li>
+            <NavLink to="/ai-writer" className={({ isActive }) => isActive ? activeLink : normalLink}>
+              🧠 AI Message Writer
+            </NavLink>
+          </li>   
+        </div>
+        )}
+      {canView([ROLES.ADMIN, ROLES.MANAGER,ROLES.AGENT]) && (
+        <div>
+          <li>
+            <NavLink to="/manage/templates" className={({ isActive }) => isActive ? activeLink : normalLink}>
+              🧠 Manage Templates
+            </NavLink>
+          </li>
+          <li>
+            <NavLink to="/view/templates" className={({ isActive }) => isActive ? activeLink : normalLink}>
+              🧠  Templates Library
+            </NavLink>
+          </li>
+          </div>
+          
+      )}
+
+    </ul>
+  </li>
 
           {/* === INTEGRATIONS === */}
           {canView([ROLES.ADMIN, ROLES.MANAGER]) && (

@@ -40,6 +40,11 @@ import LeadThreadPage from "./components/LeadThreadPage";
 import SequencesPage from "./components/SequencesPage";
 import FeaturesPage from "./pages/Features";
 import Help from "./components/Help";
+import TemplateManager from "./components/TemplateManager";
+import TemplateLibrary from "./components/TemplateLibrary";
+import ForgotPassword from "./components/ForgotPassword";
+import ResetPassword from "./components/ResetPassword";
+import ConfirmEmail from "./components/ConfirmEmail";
 const queryClient = new QueryClient();
 
 const App: React.FC = () => {
@@ -112,8 +117,9 @@ const App: React.FC = () => {
           <Route path="/waitlist" element={<Waitlist />} />
           <Route path="/features" element={<FeaturesPage />} />
          <Route path="/sequences" element={<SequencesPage />} />
-         
-
+         <Route path="/forgot-password" element={<ForgotPassword />} />
+         <Route path="/reset-password" element={<ResetPassword />} />
+         <Route path="/confirm-email" element={<ConfirmEmail />} />
           <Route path="/connect-email" element={<ConnectAccount />} />
 
           {/* Sidebar (unprotected route render) */}
@@ -137,9 +143,27 @@ const App: React.FC = () => {
               </RoleProtectedRoute>
             }
           />
+            <Route
+            path="/manage/templates"
+            element={
+              <RoleProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.MANAGER, ROLES.AGENT,ROLES.GUEST]}>
+                <TemplateManager />
+              </RoleProtectedRoute>
+            }
+          />
+           <Route
+            path="/view/templates"
+            element={
+              <RoleProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.MANAGER, ROLES.AGENT,ROLES.GUEST]}>
+                <TemplateLibrary />
+              </RoleProtectedRoute>
+            }
+          />
+          
+          
 
 
-          <Route
+         <Route
             path="/leads"
             element={
               <RoleProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.MANAGER, ROLES.AGENT]}>
@@ -214,7 +238,7 @@ const App: React.FC = () => {
           <Route
             path="/ai-writer"
             element={
-              <RoleProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.MANAGER, ROLES.AGENT]}>
+              <RoleProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.MANAGER, ROLES.AGENT,ROLES.GUEST]}>
                 <AIWriter />
               </RoleProtectedRoute>
             }
@@ -297,6 +321,16 @@ const App: React.FC = () => {
               </RoleProtectedRoute>
             }
           />
+              <Route
+            path="/manage/templates"
+            element={
+              <RoleProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.MANAGER, ROLES.AGENT]}>
+                <TemplateManager />
+              </RoleProtectedRoute>
+            }
+          />
+
+           
 
            
 

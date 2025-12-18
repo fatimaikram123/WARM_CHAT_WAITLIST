@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { Send, Mail, MessageSquare, Wand2 } from "lucide-react";
+import { Send, Mail, MessageSquare, Wand2,FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import MainLayout from "./MainLayout";
 import toast, { Toaster } from "react-hot-toast";
 
-const personas = ["Sales Representative", "Support Agent", "Marketing Specialist"];
-const tones = ["Friendly", "Formal", "Casual", "Persuasive"];
-
+// const personas = ["Sales Representative", "Support Agent", "Marketing Specialist"];
+// const tones = ["Friendly", "Formal", "Casual", "Persuasive"];
 const NewMessage = () => {
   const [channel, setChannel] = useState<"Email" | "SMS" | "">("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [senderName, setSenderName] = useState(localStorage.getItem("gmail_user_name") || "");
+  const [tones, setTones] = useState([]);
+  const [personas, setPersonas] = useState([]);
 
   const [leads, setLeads] = useState<any[]>([]);
   const [selectedLeadEmails, setSelectedLeadEmails] = useState<string[]>([]);
@@ -24,21 +25,25 @@ const NewMessage = () => {
   const [selectedPersona, setSelectedPersona] = useState(personas[0]);
   const [selectedTone, setSelectedTone] = useState(tones[0]);
 
-  const BASE_API = import.meta.env.VITE_API_BASE;
+  const API_BASE = import.meta.env.VITE_API_BASE;
   const token = localStorage.getItem("token");
   const userId = localStorage.getItem("user_id");
   const org_id = localStorage.getItem("org_id");
+   const headers = {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`${BASE_API}/api/leads/${org_id}`, {
+    fetch(`${API_BASE}/api/leads/${org_id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
       .then((data) => setLeads(data || []))
       .catch(() => console.log("Failed to load leads"));
-  }, [BASE_API, org_id, token]);
+  }, [API_BASE, org_id, token]);
 
   const handleCheckboxChange = (email: string, id: number) => {
     setSelectedLeadEmails((prev) =>
@@ -48,6 +53,30 @@ const NewMessage = () => {
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
   };
+  
+    const fetchAll = async () => {
+      try {
+        const [
+        
+          toneRes,
+          personaRes,
+        ] = await Promise.all([
+      
+          fetch(`${API_BASE}/api/ai/tones`, { headers }).then(r => r.json()),
+          fetch(`${API_BASE}/api/ai/personas`, { headers }).then(r => r.json()),
+        ]);
+  
+        setTones(toneRes);
+        setPersonas(personaRes);
+      } catch (e) {
+        console.error(e);
+      }
+    };
+  
+    useEffect(() => {
+      fetchAll();
+    }, []);
+  
 
   const handleImproveMessage = async () => {
     if (!message.trim()) return toast.error("Message cannot be empty!");
@@ -57,7 +86,7 @@ const NewMessage = () => {
     setSuggestions([]);
 
     try {
-      const res = await fetch(`${BASE_API}/api/ai/generate/improve`, {
+      const res = await fetch(`${API_BASE}/api/ai/generate/improve`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -114,7 +143,7 @@ const NewMessage = () => {
       lead_ids: selectedLeadIds,
     };
 
-    const res = await fetch(`${BASE_API}/api/inbox/send`, {
+    const res = await fetch(`${API_BASE}/api/inbox/send`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -131,6 +160,37 @@ const NewMessage = () => {
       toast.error("❌ Failed to send message.");
     }
   };
+  const handleSelectTemplate = (template: any) => {
+  setMessage(template.content);
+  if (channel === "Email" && !subject) {
+    setSubject(template.title);
+  }
+  setShowTemplateDialog(false);
+};
+  const [showTemplateDialog, setShowTemplateDialog] = useState(false);
+  const [templateCategories, setTemplateCategories] = useState<any[]>([]);
+  const [loadingTemplates, setLoadingTemplates] = useState(false);
+  const fetchTemplates = async () => {
+  setLoadingTemplates(true);
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/ai/fetch/templates-by-category?org_id=${org_id}`,
+      { headers }
+    );
+    const data = await res.json();
+    setTemplateCategories(data || []);
+  } catch (e) {
+    toast.error("Failed to load templates");
+  }
+  setLoadingTemplates(false);
+};
+  const handleOpenTemplateDialog = async () => {
+  setShowTemplateDialog(true);
+  if (templateCategories.length === 0) {
+    await fetchTemplates();
+  }
+};
+
 
   return (
     <MainLayout>
@@ -175,9 +235,8 @@ const NewMessage = () => {
                 onChange={(e) => setSelectedPersona(e.target.value)}
                 className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-300 focus:outline-none"
               >
-                {personas.map((p, idx) => (
-                  <option key={idx} value={p}>{p}</option>
-                ))}
+            {personas.map(p => <option key={p.id} value={p.label}>{p.label}</option>)}
+          
               </select>
             </div>
 
@@ -188,9 +247,8 @@ const NewMessage = () => {
                 onChange={(e) => setSelectedTone(e.target.value)}
                 className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-300 focus:outline-none"
               >
-                {tones.map((t, idx) => (
-                  <option key={idx} value={t}>{t}</option>
-                ))}
+              {tones.map(t => <option key={t.id} value={t.label}>{t.label}</option>)}
+
               </select>
             </div>
           </div>
@@ -246,7 +304,7 @@ const NewMessage = () => {
               className="w-full border border-gray-300 rounded-2xl px-4 py-3 pr-20 text-gray-700 focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
             ></textarea>
 
-            <div className="absolute top-3 right-3">
+            <div className="absolute top-3 right-3 flex  gap-1">
               <button
                 onClick={handleImproveMessage}
                 className="bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-full shadow-md flex items-center justify-center"
@@ -257,6 +315,14 @@ const NewMessage = () => {
                 ) : (
                   <Wand2 size={16} />
                 )}
+              </button>
+                <button
+                onClick={handleOpenTemplateDialog}
+                className="bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-full shadow-md flex items-center justify-center"
+                title="Choose template"
+              >
+                  <FileText size={16} />
+              
               </button>
             </div>
           </div>
@@ -290,6 +356,58 @@ const NewMessage = () => {
           </div>
         </div>
       </div>
+      {showTemplateDialog && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="bg-white w-full max-w-2xl rounded-2xl shadow-xl p-6 relative">
+
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold text-gray-800">
+          Choose a Template
+        </h2>
+        <button
+          onClick={() => setShowTemplateDialog(false)}
+          className="text-gray-500 hover:text-gray-700"
+        >
+          ✕
+        </button>
+      </div>
+
+      {loadingTemplates ? (
+        <p className="text-gray-500">Loading templates...</p>
+      ) : templateCategories.length === 0 ? (
+        <p className="text-gray-500">No templates available.</p>
+      ) : (
+        <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+          {templateCategories.map((cat) => (
+            <div key={cat.id}>
+              <h3 className="font-semibold text-orange-600 mb-2">
+                {cat.name}
+              </h3>
+
+              <div className="space-y-2">
+                {cat.templates.map((tpl) => (
+                  <div
+                    key={tpl.id}
+                    onClick={() => handleSelectTemplate(tpl)}
+                    className="border rounded-lg p-3 cursor-pointer hover:bg-orange-50 transition"
+                  >
+                    <p className="font-medium text-gray-800">
+                      {tpl.title}
+                    </p>
+                    <p className="text-sm text-gray-500 truncate">
+                      {tpl.content.slice(0, 80)}...
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+)}
+
     </MainLayout>
   );
 };

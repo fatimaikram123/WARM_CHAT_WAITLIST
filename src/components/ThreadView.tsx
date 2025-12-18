@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"; 
 import { useParams, useNavigate } from "react-router-dom";
 import MainLayout from "../components/MainLayout";
-import { ArrowLeft, Send, Wand2 } from "lucide-react";
+import { ArrowLeft, Send, Wand2,FileText } from "lucide-react";
 import toast, { Toaster } from "react-hot-toast";
 
 export default function ThreadView() {
@@ -30,8 +30,18 @@ export default function ThreadView() {
   // AI states
   const [loadingAI, setLoadingAI] = useState(false);
   const [aiTone, setAiTone] = useState("Friendly");
-  const [aiPersona, setAiPersona] = useState("Sales Representative");
-  const [aiChannel, setAiChannel] = useState("email");
+  const [tones, setTones] = useState([]);
+  const [personas, setPersonas] = useState([]);
+  const [selectedPersona, setSelectedPersona] = useState(personas[0]);
+  const [selectedTone, setSelectedTone] = useState(tones[0]);
+  const [showTemplateDialog, setShowTemplateDialog] = useState(false);
+  const [templateCategories, setTemplateCategories] = useState<any[]>([]);
+  const [loadingTemplates, setLoadingTemplates] = useState(false);
+  
+    const headers = {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
 
   // -------------------- Auto-fetch interval --------------------
   useEffect(() => {
@@ -93,6 +103,29 @@ export default function ThreadView() {
   useEffect(() => {
     fetchThread(true);
   }, [thread_id]);
+      const fetchAll = async () => {
+        try {
+          const [
+          
+            toneRes,
+            personaRes,
+          ] = await Promise.all([
+        
+            fetch(`${API_BASE}/api/ai/tones`, { headers }).then(r => r.json()),
+            fetch(`${API_BASE}/api/ai/personas`, { headers }).then(r => r.json()),
+          ]);
+    
+          setTones(toneRes);
+          setPersonas(personaRes);
+        } catch (e) {
+          console.error(e);
+        }
+      };
+    
+      useEffect(() => {
+        fetchAll();
+      }, []);
+    
 
   // -------------------- Preselect leads --------------------
   useEffect(() => {
@@ -129,6 +162,10 @@ export default function ThreadView() {
       prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
     );
   };
+  const handleSelectTemplate = (template: any) => {
+        setReply(template.content);
+        setShowTemplateDialog(false);
+};
 
   // -------------------- Send reply --------------------
   const handleReply = async () => {
@@ -184,6 +221,8 @@ const handleGenerateAI = async () => {
     toast.error("Please select at least one lead for AI generation!");
     return;
   }
+ 
+
 
   setLoadingAI(true);
   try {
@@ -203,8 +242,8 @@ const handleGenerateAI = async () => {
       body: JSON.stringify({
         conversation,
         tone: aiTone,
-        persona: aiPersona,
-        channel: aiChannel,
+        persona: selectedPersona,
+        channel: selectedTone,
         lead_data,
         num_messages: 5
       }),
@@ -228,6 +267,27 @@ setReply(aiMessage);
   }
   setLoadingAI(false);
 };
+  const handleOpenTemplateDialog = async () => {
+  setShowTemplateDialog(true);
+  if (templateCategories.length === 0) {
+    await fetchTemplates();
+  }
+};
+  const fetchTemplates = async () => {
+  setLoadingTemplates(true);
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/ai/fetch/templates-by-category?org_id=${org_id}`,
+      { headers }
+    );
+    const data = await res.json();
+    setTemplateCategories(data || []);
+  } catch (e) {
+    toast.error("Failed to load templates");
+  }
+  setLoadingTemplates(false);
+};
+
 
   // -------------------- Generate AI reply --------------------
   // const handleGenerateAI = async () => {
@@ -344,38 +404,31 @@ setReply(aiMessage);
                 )}
               </div>
             </div>
-
-            {/* AI Options */}
-            <div className="flex items-center gap-2 mb-2">
+               <div className="mb-4 p-4 bg-gray-50 border border-gray-200 rounded-2xl flex gap-4">
+            <div className="flex flex-col w-1/2">
+              <label className="text-gray-700 font-medium mb-1">Persona</label>
               <select
-                value={aiTone}
-                onChange={(e) => setAiTone(e.target.value)}
-                className="border rounded p-2 text-sm"
+                value={selectedPersona}
+                onChange={(e) => setSelectedPersona(e.target.value)}
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-300 focus:outline-none"
               >
-                <option>Friendly</option>
-                <option>Professional</option>
-                <option>Formal</option>
-                <option>Casual</option>
-                <option>Persuasive</option>
-                <option>Informative</option>
-                <option>Empathetic</option>
-              </select>
-
-              <select
-                value={aiPersona}
-                onChange={(e) => setAiPersona(e.target.value)}
-                className="border rounded p-2 text-sm"
-              >
-                <option>Sales Representative</option>
-                <option>Customer Support</option>
-                <option>Technical Specialist</option>
-                <option>Marketing Expert</option>
-                <option>Product Manager</option>
+            {personas.map(p => <option key={p.id} value={p.label}>{p.label}</option>)}
+          
               </select>
             </div>
 
-            {/* Reply textarea with AI button */}
-            {/* Reply textarea with AI button */}
+            <div className="flex flex-col w-1/2">
+              <label className="text-gray-700 font-medium mb-1">Tone</label>
+              <select
+                value={selectedTone}
+                onChange={(e) => setSelectedTone(e.target.value)}
+                className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-orange-300 focus:outline-none"
+              >
+              {tones.map(t => <option key={t.id} value={t.label}>{t.label}</option>)}
+
+              </select>
+            </div>
+          </div>
 <div className="relative">
   <textarea
     value={reply}
@@ -398,6 +451,14 @@ setReply(aiMessage);
         <Wand2 size={16} />
       )}
     </button>
+        <button
+                    onClick={handleOpenTemplateDialog}
+                    className="bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-full shadow-md flex items-center justify-center"
+                    title="Choose template"
+                  >
+                      <FileText size={16} />
+                  
+                  </button>
   </div>
 </div>
 
@@ -443,6 +504,57 @@ setReply(aiMessage);
       ) : (
         <div className="text-center text-gray-500">Loading conversation...</div>
       )}
+           {showTemplateDialog && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <div className="bg-white w-full max-w-2xl rounded-2xl shadow-xl p-6 relative">
+
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold text-gray-800">
+          Choose a Template
+        </h2>
+        <button
+          onClick={() => setShowTemplateDialog(false)}
+          className="text-gray-500 hover:text-gray-700"
+        >
+          ✕
+        </button>
+      </div>
+
+      {loadingTemplates ? (
+        <p className="text-gray-500">Loading templates...</p>
+      ) : templateCategories.length === 0 ? (
+        <p className="text-gray-500">No templates available.</p>
+      ) : (
+        <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+          {templateCategories.map((cat) => (
+            <div key={cat.id}>
+              <h3 className="font-semibold text-orange-600 mb-2">
+                {cat.name}
+              </h3>
+
+              <div className="space-y-2">
+                {cat.templates.map((tpl) => (
+                  <div
+                    key={tpl.id}
+                    onClick={() => handleSelectTemplate(tpl)}
+                    className="border rounded-lg p-3 cursor-pointer hover:bg-orange-50 transition"
+                  >
+                    <p className="font-medium text-gray-800">
+                      {tpl.title}
+                    </p>
+                    <p className="text-sm text-gray-500 truncate">
+                      {tpl.content.slice(0, 80)}...
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  </div>
+)}
     </MainLayout>
   );
 }

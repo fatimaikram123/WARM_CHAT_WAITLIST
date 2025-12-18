@@ -21,6 +21,7 @@ export default function AIWriter() {
   const [prompt, setPrompt] = useState("");
   const [tone, setTone] = useState("Friendly");
   const [persona, setPersona] = useState("Sales Representative");
+  const token = localStorage.getItem("token") || "";
   const [response, setResponse] = useState({
   messageText: "",
   reply_suggestions: [],
@@ -37,9 +38,10 @@ export default function AIWriter() {
   try {
     const res = await fetch(`${API_BASE}/api/ai/generate`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json",Authorization: `Bearer ${token}` },
       body: JSON.stringify({ prompt, tone, persona }),
     });
+   
 
     const data = await res.json();
     const ai = data.response;

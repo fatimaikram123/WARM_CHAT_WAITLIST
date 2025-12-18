@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import toast,{Toaster} from "react-hot-toast";
 
 const Signup: React.FC = () => {
 
@@ -32,7 +33,8 @@ const Signup: React.FC = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage("✅ Account created successfully!");
+        toast(data.message || "✅ Signup successful! Please check your email to confirm your account.");
+        setMessage(data.message);
         setTimeout(() => navigate("/login"), 1500);
       } else {
         setMessage(`❌ ${data.message || "Signup failed"}`);
@@ -47,6 +49,7 @@ const Signup: React.FC = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-100 to-warmchats-flame/20 px-4">
+        <Toaster position="top-right" />
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md p-8">
         <div className="flex flex-col items-center mb-6">
           <img

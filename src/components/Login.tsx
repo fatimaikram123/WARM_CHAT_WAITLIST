@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast, { Toaster } from "react-hot-toast";
-
+import { GoogleLogin } from "@react-oauth/google";
 const Login: React.FC = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
@@ -66,6 +66,86 @@ const Login: React.FC = () => {
       setLoading(false);
     }
   };
+  const handleGoogleLogin = async (credentialResponse: any) => {
+  try {
+    const res = await fetch(`${API_BASE}/api/auth/google-login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id_token: credentialResponse.credential,
+      }),
+    });
+
+    const data = await res.json();
+
+    // 🚫 Not logged in (needs confirmation)
+    if (!res.ok || !data.access_token) {
+      toast(data.message || "Please confirm your email");
+      return;
+    }
+
+    // ✅ Logged in
+    const decoded = JSON.parse(atob(data.access_token.split(".")[1]));
+
+    localStorage.setItem("token_exp", (decoded.exp * 1000).toString());
+    localStorage.setItem("token", data.access_token);
+    localStorage.setItem("user_id", data.user_id);
+    localStorage.setItem("name", data.name);
+    localStorage.setItem("role_id", data.role_id);
+    localStorage.setItem("role_name", data.role_name);
+    localStorage.setItem("org_id", data.org_id);
+    localStorage.setItem("email", data.email);
+
+    toast.success("Logged in with Google 🎉");
+    if(data.role_name==="Guest"){
+      navigate("/help");
+    }
+    else{
+    navigate("/dashboard");
+    }
+  } catch (e: any) {
+    console.error(e);
+    toast.error("Google login failed");
+  }
+};
+// const handleGoogleLogin = async (credentialResponse) => {
+//       try {
+//         const res = await fetch(`${API_BASE}/api/auth/google-login`, {
+//           method: "POST",
+//           headers: { "Content-Type": "application/json" },
+//           body: JSON.stringify({
+//             id_token: credentialResponse.credential,
+//           }),
+//         });
+
+//         const data = await res.json();
+//         if (!res.ok) {
+//           if(data.message){
+//           toast.success(data.message)
+//           return;
+//            } 
+//         else if(!data.message){
+//             toast.error("Google login failed");
+//             return;
+//           }
+//         }
+//         const decoded = JSON.parse(atob(data.access_token.split(".")[1]));
+//         localStorage.setItem("token_exp", (decoded.exp * 1000).toString());
+//         localStorage.setItem("token", data.access_token);
+//         localStorage.setItem("user_id", data.user_id);
+//         localStorage.setItem("name", data.name);
+//         localStorage.setItem("role_id", data.role_id);
+//         localStorage.setItem("role_name", data.role_name);
+//         localStorage.setItem("org_id", data.org_id);
+//         localStorage.setItem("email", data.email);
+
+//         toast.success("Logged in with Google 🎉");
+//         navigate("/help");
+//         navigate("/dashboard");
+//       } catch (e) {
+//         toast.error(e);
+//       }
+// };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-100 to-warmchats-flame/20 px-4">
@@ -101,6 +181,14 @@ const Login: React.FC = () => {
               className="mt-1 w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-warmchats-primary focus:border-transparent outline-none"
             />
           </div>
+               <div className="text-left mt-2">
+  <button
+    onClick={() => navigate("/forgot-password")}
+    className="text-sm text-warmchats-primary hover:underline"
+  >
+    Forgot password?
+  </button>
+</div>
 
           <button
             type="submit"
@@ -110,6 +198,7 @@ const Login: React.FC = () => {
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
+      
 
         <div className="text-center mt-4">
           <p className="text-sm text-gray-600">
@@ -122,6 +211,13 @@ const Login: React.FC = () => {
             </button>
           </p>
         </div>
+       
+         <div className="mt-4">
+  <GoogleLogin onSuccess={ handleGoogleLogin}
+  />
+</div>
+       
+
       </div>
     </div>
   );

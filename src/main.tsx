@@ -6,6 +6,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { CRMProvider } from "./context/CRMContext"; // ✅ make sure this path is correct
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 // ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
 //   <React.StrictMode>
@@ -21,7 +22,10 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <BrowserRouter>
       <CRMProvider>
-        <App />
+        <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+  <App />
+</GoogleOAuthProvider>
+
       </CRMProvider>
     </BrowserRouter>
   </React.StrictMode>
