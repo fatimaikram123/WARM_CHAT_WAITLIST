@@ -69,7 +69,7 @@ export default function PricingForAdmin() {
   
       <section id="pricing" className=" bg-gradient-to-br to-purple-50 min-h-screen">
         <div className="max-w-6xl mx-auto text-center mb-12">
-          <h1 className="text-4xl font-extrabold text-gray-800 mb-3">
+          <h1 data-aos="fade-up" className="text-4xl font-extrabold text-gray-800 mb-3">
             Choose Your <span className="text-orange-500">WarmChats</span> Plan
           </h1>
           <p className="text-gray-600 text-lg">
@@ -112,7 +112,7 @@ export default function PricingForAdmin() {
         </div>
 
         <div className="mt-16 text-center">
-          <p className="text-gray-700 mb-4">Interested in bigger plans or custom features?</p>
+          <p  data-aos="fade-up" className="text-gray-700 mb-4">Interested in bigger plans or custom features?</p>
           <a
             href={import.meta.env.VITE_CALENDLY_LINK}
             target="_blank"
