@@ -32,11 +32,11 @@ const LeadThreadPage: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const threadsRes = await fetch(`${API_BASE}/api/inbox/thread/leads`, {
+        const threadsRes = await fetch(`${API_BASE}/inbox/thread/leads`, {
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         });
 
-        const leadsRes = await fetch(`${API_BASE}/api/leads/${org_id}`, {
+        const leadsRes = await fetch(`${API_BASE}/leads/${org_id}`, {
           headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         });
 

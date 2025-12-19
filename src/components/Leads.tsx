@@ -36,7 +36,7 @@ const [leadToDelete, setLeadToDelete] = useState<number | null>(null);
     setLoading(true);
     setMessage("");
     try {
-      const res = await fetch(`${API_BASE}/api/leads/${org_id}`, {
+      const res = await fetch(`${API_BASE}/leads/${org_id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Failed to fetch leads");
@@ -51,7 +51,7 @@ const [leadToDelete, setLeadToDelete] = useState<number | null>(null);
    const handleDeleteLead = async (id: number) => {
 
     try {
-      const res = await fetch(`${API_BASE}/api/leads/delete/${id}`, {
+      const res = await fetch(`${API_BASE}/leads/delete/${id}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -82,7 +82,7 @@ const [leadToDelete, setLeadToDelete] = useState<number | null>(null);
         owner_id: localStorage.getItem("user_id"),
       };
 
-      const res = await fetch(`${API_BASE}/api/leads/`, {
+      const res = await fetch(`${API_BASE}/leads/`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -128,7 +128,7 @@ const [leadToDelete, setLeadToDelete] = useState<number | null>(null);
 
       const payload = { ...editingLead, tags: tagsArray };
 
-      const res = await fetch(`${API_BASE}/api/leads/${editingLead.id}`, {
+      const res = await fetch(`${API_BASE}/leads/${editingLead.id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -158,7 +158,7 @@ const [leadToDelete, setLeadToDelete] = useState<number | null>(null);
     formData.append("file", file);
 
     try {
-      const response = await fetch(`${API_BASE}/api/leads/import/${org_id}`, {
+      const response = await fetch(`${API_BASE}/leads/import/${org_id}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,

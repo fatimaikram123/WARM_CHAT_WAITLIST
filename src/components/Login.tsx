@@ -32,7 +32,7 @@ const Login: React.FC = () => {
 
 
     try {
-      const response = await fetch(`${API_BASE}/api/auth/login`, {
+      const response = await fetch(`${API_BASE}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -68,7 +68,7 @@ const Login: React.FC = () => {
   };
   const handleGoogleLogin = async (credentialResponse: any) => {
   try {
-    const res = await fetch(`${API_BASE}/api/auth/google-login`, {
+    const res = await fetch(`${API_BASE}/auth/google-login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -110,7 +110,7 @@ const Login: React.FC = () => {
 };
 // const handleGoogleLogin = async (credentialResponse) => {
 //       try {
-//         const res = await fetch(`${API_BASE}/api/auth/google-login`, {
+//         const res = await fetch(`${API_BASE}/auth/google-login`, {
 //           method: "POST",
 //           headers: { "Content-Type": "application/json" },
 //           body: JSON.stringify({

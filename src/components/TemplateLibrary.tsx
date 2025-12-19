@@ -20,7 +20,7 @@ export default function TemplateLibrary() {
 
   const fetchData = async () => {
     const res = await fetch(
-      `${API_BASE}/api/ai/fetch/templates-by-category?org_id=${orgId}`,
+      `${API_BASE}/ai/fetch/templates-by-category?org_id=${orgId}`,
       { headers }
     );
     setData(await res.json());
@@ -37,7 +37,7 @@ export default function TemplateLibrary() {
 
     setLoadingAI(true);
 
-    const res = await fetch(`${API_BASE}/api/ai/generate/template`, {
+    const res = await fetch(`${API_BASE}/ai/generate/template`, {
       method: "POST",
       headers,
       body: JSON.stringify({
@@ -56,7 +56,7 @@ export default function TemplateLibrary() {
 
   const saveTemplate = async () => {
     await fetch(
-      `${API_BASE}/api/ai/templates/${editingTemplate.id}`,
+      `${API_BASE}/ai/templates/${editingTemplate.id}`,
       {
         method: "PUT",
         headers,
@@ -74,7 +74,7 @@ export default function TemplateLibrary() {
   const deleteTemplate = async (id) => {
     if (!confirm("Delete this template?")) return;
 
-    await fetch(`${API_BASE}/api/ai/templates/${id}`, {
+    await fetch(`${API_BASE}/ai/templates/${id}`, {
       method: "DELETE",
       headers,
     });
@@ -87,7 +87,7 @@ export default function TemplateLibrary() {
 
   const saveCategory = async () => {
     await fetch(
-      `${API_BASE}/api/ai/template-categories/${editingCategory.id}`,
+      `${API_BASE}/ai/template-categories/${editingCategory.id}`,
       {
         method: "PUT",
         headers,
@@ -108,7 +108,7 @@ export default function TemplateLibrary() {
   const deleteCategory = async (id) => {
     if (!confirm("Delete category and its templates?")) return;
 
-    await fetch(`${API_BASE}/api/ai/template-categories/${id}`, {
+    await fetch(`${API_BASE}/ai/template-categories/${id}`, {
       method: "DELETE",
       headers,
     });
@@ -119,7 +119,7 @@ export default function TemplateLibrary() {
     const handleAddCategory = async () => {
     if (!newCategoryName) return;
 
-    await fetch(`${API_BASE}/api/ai/template-categories`, {
+    await fetch(`${API_BASE}/ai/template-categories`, {
       method: "POST",
       headers,
       body: JSON.stringify({ name: newCategoryName, org_id: orgId }),

@@ -21,7 +21,7 @@ const ThreadPage: React.FC = () => {
 
   useEffect(() => {
     const fetchMessages = async () => {
-      const res = await fetch(`${API_BASE}/api/inbox/thread/${thread_id}`, {
+      const res = await fetch(`${API_BASE}/inbox/thread/${thread_id}`, {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       });
       const data = await res.json();
@@ -33,7 +33,7 @@ const ThreadPage: React.FC = () => {
 
   const handleSend = async () => {
     if (!newMessage.trim()) return;
-    await fetch(`${API_BASE}/api/inbox/thread/send/reply`, {
+    await fetch(`${API_BASE}/inbox/thread/send/reply`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({
@@ -44,7 +44,7 @@ const ThreadPage: React.FC = () => {
       }),
     });
     setNewMessage("");
-    const reload = await fetch(`${API_BASE}/api/inbox/thread/${thread_id}`, {
+    const reload = await fetch(`${API_BASE}/inbox/thread/${thread_id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     const updated = await reload.json();

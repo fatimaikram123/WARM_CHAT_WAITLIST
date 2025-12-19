@@ -27,7 +27,7 @@ export default function SalesforceIntegration() {
   const checkStatus = async () => {
     try {
       const res = await fetch(
-        `${API_BASE}/api/crm/salesforce/status/${orgId}`,
+        `${API_BASE}/crm/salesforce/status/${orgId}`,
         { headers: { Authorization: `Bearer ${authToken}` } }
       );
       const data = await res.json();
@@ -51,7 +51,7 @@ export default function SalesforceIntegration() {
 
   // ---------------- Connect ----------------
   const handleConnect = () => {
-    window.location.href = `${API_BASE}/api/crm/connect-salesforce?state=${orgId}`;
+    window.location.href = `${API_BASE}/crm/connect-salesforce?state=${orgId}`;
   };
 
   // ---------------- Disconnect ----------------
@@ -60,7 +60,7 @@ export default function SalesforceIntegration() {
       setDisconnecting(true);
 
       await fetch(
-        `${API_BASE}/api/crm/disconnect-salesforce/${orgId}`,
+        `${API_BASE}/crm/disconnect-salesforce/${orgId}`,
         {
           method: "POST",
           headers: { Authorization: `Bearer ${authToken}` },
@@ -90,7 +90,7 @@ export default function SalesforceIntegration() {
 
     try {
       const res = await fetch(
-        `${API_BASE}/api/crm/fetch-salesforce-leads/${ownerId}/${orgId}`,
+        `${API_BASE}/crm/fetch-salesforce-leads/${ownerId}/${orgId}`,
         { headers: { Authorization: `Bearer ${authToken}` } }
       );
 

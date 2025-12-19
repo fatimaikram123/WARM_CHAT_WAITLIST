@@ -41,10 +41,10 @@ export default function TemplateManager() {
         toneRes,
         personaRes,
       ] = await Promise.all([
-        fetch(`${API_BASE}/api/ai/fetch/template-categories?org_id=${orgId}`, { headers }).then(r => r.json()),
-        fetch(`${API_BASE}/api/ai/fetch/templates?org_id=${orgId}`, { headers }).then(r => r.json()),
-        fetch(`${API_BASE}/api/ai/tones`, { headers }).then(r => r.json()),
-        fetch(`${API_BASE}/api/ai/personas`, { headers }).then(r => r.json()),
+        fetch(`${API_BASE}/ai/fetch/template-categories?org_id=${orgId}`, { headers }).then(r => r.json()),
+        fetch(`${API_BASE}/ai/fetch/templates?org_id=${orgId}`, { headers }).then(r => r.json()),
+        fetch(`${API_BASE}/ai/tones`, { headers }).then(r => r.json()),
+        fetch(`${API_BASE}/ai/personas`, { headers }).then(r => r.json()),
       ]);
 
       setCategories(catRes);
@@ -69,7 +69,7 @@ export default function TemplateManager() {
     setLoadingAI(true);
 
     try {
-       const res = await fetch(`${API_BASE}/api/ai/generate/template`, {
+       const res = await fetch(`${API_BASE}/ai/generate/template`, {
   method: "POST",
   headers,
   body: JSON.stringify({
@@ -104,7 +104,7 @@ setNewTemplate({
     const { title, content, category_id } = newTemplate;
     if (!title || !content || !category_id) return;
 
-    await fetch(`${API_BASE}/api/ai/templates`, {
+    await fetch(`${API_BASE}/ai/templates`, {
       method: "POST",
       headers,
       body: JSON.stringify({

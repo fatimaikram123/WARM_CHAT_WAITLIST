@@ -18,7 +18,7 @@ export default function UnifiedInbox() {
   useEffect(() => {
     const fetchEmails = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/inbox/fetch/${userId}`, {
+        const res = await fetch(`${API_BASE}/inbox/fetch/${userId}`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`, // ✅ Token added
@@ -44,7 +44,7 @@ export default function UnifiedInbox() {
     if (!reply || !selected) return;
 
     try {
-      const res = await fetch(`${API_BASE}/api/inbox/send`, {
+      const res = await fetch(`${API_BASE}/inbox/send`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

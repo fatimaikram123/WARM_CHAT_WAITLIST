@@ -14,7 +14,7 @@ const CreateOrganization: React.FC = () => {
     setSuccess("");
 
     try {
-      const res = await fetch(`${API_BASE}/api/orgs/addorg`, {
+      const res = await fetch(`${API_BASE}/orgs/addorg`, {
         method: "POST",
         headers: {
           "Authorization": `Bearer ${token}`,

@@ -12,7 +12,7 @@ export default function ConfirmEmail() {
     if (!token || calledRef.current) return;
     calledRef.current = true;
 
-    fetch(`${API_BASE}/api/auth/confirm-email?token=${token}`, {
+    fetch(`${API_BASE}/auth/confirm-email?token=${token}`, {
       method: "GET",
     })
       .then(async (res) => {

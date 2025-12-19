@@ -27,7 +27,7 @@ export default function ConnectAccount() {
     setStatus("🔄 Connecting...");
 
     try {
-      const res = await fetch(`${API_BASE}/api/inbox/connect`, {
+      const res = await fetch(`${API_BASE}/inbox/connect`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -48,7 +48,7 @@ export default function ConnectAccount() {
       setStatus("❌ Network or server error");
     }
     try {
-      const res = await fetch(`${API_BASE}/api/inbox/gmail/${userId}`, {
+      const res = await fetch(`${API_BASE}/inbox/gmail/${userId}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

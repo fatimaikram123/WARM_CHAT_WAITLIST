@@ -37,7 +37,7 @@ const NewMessage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`${API_BASE}/api/leads/${org_id}`, {
+    fetch(`${API_BASE}/leads/${org_id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => res.json())
@@ -62,8 +62,8 @@ const NewMessage = () => {
           personaRes,
         ] = await Promise.all([
       
-          fetch(`${API_BASE}/api/ai/tones`, { headers }).then(r => r.json()),
-          fetch(`${API_BASE}/api/ai/personas`, { headers }).then(r => r.json()),
+          fetch(`${API_BASE}/ai/tones`, { headers }).then(r => r.json()),
+          fetch(`${API_BASE}/ai/personas`, { headers }).then(r => r.json()),
         ]);
   
         setTones(toneRes);
@@ -86,7 +86,7 @@ const NewMessage = () => {
     setSuggestions([]);
 
     try {
-      const res = await fetch(`${API_BASE}/api/ai/generate/improve`, {
+      const res = await fetch(`${API_BASE}/ai/generate/improve`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -143,7 +143,7 @@ const NewMessage = () => {
       lead_ids: selectedLeadIds,
     };
 
-    const res = await fetch(`${API_BASE}/api/inbox/send`, {
+    const res = await fetch(`${API_BASE}/inbox/send`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -174,7 +174,7 @@ const NewMessage = () => {
   setLoadingTemplates(true);
   try {
     const res = await fetch(
-      `${API_BASE}/api/ai/fetch/templates-by-category?org_id=${org_id}`,
+      `${API_BASE}/ai/fetch/templates-by-category?org_id=${org_id}`,
       { headers }
     );
     const data = await res.json();

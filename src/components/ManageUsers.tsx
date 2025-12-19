@@ -31,7 +31,7 @@ const ManageUsers: React.FC = () => {
     setLoading(true);
     setMessage(null);
     try {
-      const res = await fetch(`${API_BASE}/api/auth/users`, {
+      const res = await fetch(`${API_BASE}/auth/users`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -51,7 +51,7 @@ const ManageUsers: React.FC = () => {
 
   const fetchRoles = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/auth/roles`, {
+      const res = await fetch(`${API_BASE}/auth/roles`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Failed to fetch roles");
@@ -64,7 +64,7 @@ const ManageUsers: React.FC = () => {
 
   const fetchOrgs = async () => {
     try {
-      const res = await fetch(`${API_BASE}/api/orgs/all`, {
+      const res = await fetch(`${API_BASE}/orgs/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error("Failed to fetch organizations");
@@ -78,7 +78,7 @@ const ManageUsers: React.FC = () => {
   const handleRoleChange = async (userId: number, newRole: string) => {
     setMessage(null);
     try {
-      const res = await fetch(`${API_BASE}/api/auth/users/${userId}/role`, {
+      const res = await fetch(`${API_BASE}/auth/users/${userId}/role`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -99,7 +99,7 @@ const ManageUsers: React.FC = () => {
   const handleOrgChange = async (userId: number, newOrgId: number) => {
     setMessage(null);
     try {
-      const res = await fetch(`${API_BASE}/api/auth/users/${userId}/org`, {
+      const res = await fetch(`${API_BASE}/auth/users/${userId}/org`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

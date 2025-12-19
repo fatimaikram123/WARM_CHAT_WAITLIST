@@ -48,7 +48,7 @@ export default function ThreadView() {
     if (!thread_id || !user_id || !org_id) return;
 
     const interval = setInterval(() => {
-      fetch(`${API_BASE}/api/inbox/thread/fetch/${user_id}/${org_id}/${thread_id}`, {
+      fetch(`${API_BASE}/inbox/thread/fetch/${user_id}/${org_id}/${thread_id}`, {
         headers: { 
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json"
@@ -64,7 +64,7 @@ export default function ThreadView() {
 
   // -------------------- Fetch leads --------------------
   useEffect(() => {
-    fetch(`${API_BASE}/api/leads/${org_id}`, {
+    fetch(`${API_BASE}/leads/${org_id}`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => res.json())
@@ -75,7 +75,7 @@ export default function ThreadView() {
   // -------------------- Fetch thread messages --------------------
   const fetchThread = async (reset = false) => {
     try {
-      const res = await fetch(`${API_BASE}/api/inbox/thread/${thread_id}/${user_id}?limit=${limit}&offset=${reset ? 0 : offset}`, {
+      const res = await fetch(`${API_BASE}/inbox/thread/${thread_id}/${user_id}?limit=${limit}&offset=${reset ? 0 : offset}`, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
@@ -111,8 +111,8 @@ export default function ThreadView() {
             personaRes,
           ] = await Promise.all([
         
-            fetch(`${API_BASE}/api/ai/tones`, { headers }).then(r => r.json()),
-            fetch(`${API_BASE}/api/ai/personas`, { headers }).then(r => r.json()),
+            fetch(`${API_BASE}/ai/tones`, { headers }).then(r => r.json()),
+            fetch(`${API_BASE}/ai/personas`, { headers }).then(r => r.json()),
           ]);
     
           setTones(toneRes);
@@ -175,7 +175,7 @@ export default function ThreadView() {
     }
 
     try {
-      const res = await fetch(`${API_BASE}/api/inbox/send/reply`, {
+      const res = await fetch(`${API_BASE}/inbox/send/reply`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -236,7 +236,7 @@ const handleGenerateAI = async () => {
         role: lead.role
       }));
 
-    const res = await fetch(`${API_BASE}/api/ai/generate/reply`, {
+    const res = await fetch(`${API_BASE}/ai/generate/reply`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -277,7 +277,7 @@ setReply(aiMessage);
   setLoadingTemplates(true);
   try {
     const res = await fetch(
-      `${API_BASE}/api/ai/fetch/templates-by-category?org_id=${org_id}`,
+      `${API_BASE}/ai/fetch/templates-by-category?org_id=${org_id}`,
       { headers }
     );
     const data = await res.json();
@@ -310,7 +310,7 @@ setReply(aiMessage);
 
   //     const prompt = reply || conversation[conversation.length - 1]?.message || "";
 
-  //     const res = await fetch(`${API_BASE}/api/ai/generate`, {
+  //     const res = await fetch(`${API_BASE}/ai/generate`, {
   //       method: "POST",
   //       headers: { "Content-Type": "application/json" },
   //       body: JSON.stringify({

@@ -25,7 +25,7 @@ export default function HubSpotIntegration() {
   const checkConnection = async () => {
     try {
       const res = await fetch(
-        `${API_BASE}/api/crm/hubspot/status/${org_id}`,
+        `${API_BASE}/crm/hubspot/status/${org_id}`,
         {
           headers: { Authorization: `Bearer ${authToken}` },
         }

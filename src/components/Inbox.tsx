@@ -51,7 +51,7 @@ export default function Inbox() {
 
     const fetchPage = () => {
       fetch(
-        `${API_BASE}/api/inbox/fetch/${userId}/${org_id}?page=${currentPage}&limit=${limit}`,
+        `${API_BASE}/inbox/fetch/${userId}/${org_id}?page=${currentPage}&limit=${limit}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -82,7 +82,7 @@ export default function Inbox() {
   const fetchEmails = async () => {
     try {
       const res = await fetch(
-        `${API_BASE}/api/inbox/fetch/already/${userId}?page=${page}&limit=${limit}`,
+        `${API_BASE}/inbox/fetch/already/${userId}?page=${page}&limit=${limit}`,
         {
           headers: {
             "Content-Type": "application/json",
@@ -171,8 +171,8 @@ export default function Inbox() {
                   personaRes,
                 ] = await Promise.all([
               
-                  fetch(`${API_BASE}/api/ai/tones`, { headers }).then(r => r.json()),
-                  fetch(`${API_BASE}/api/ai/personas`, { headers }).then(r => r.json()),
+                  fetch(`${API_BASE}/ai/tones`, { headers }).then(r => r.json()),
+                  fetch(`${API_BASE}/ai/personas`, { headers }).then(r => r.json()),
                 ]);
           
                 setTones(toneRes);
@@ -191,7 +191,7 @@ export default function Inbox() {
     if (!reply || !selected) return toast.error("Select a message first!");
 
     try {
-      const res = await fetch(`${API_BASE}/api/inbox/send`, {
+      const res = await fetch(`${API_BASE}/inbox/send`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

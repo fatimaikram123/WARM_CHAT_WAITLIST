@@ -36,7 +36,7 @@ export default function AIWriter() {
   setResponse({ messageText: "", reply_suggestions: [], intent: "" });
 
   try {
-    const res = await fetch(`${API_BASE}/api/ai/generate`, {
+    const res = await fetch(`${API_BASE}/ai/generate`, {
       method: "POST",
       headers: { "Content-Type": "application/json",Authorization: `Bearer ${token}` },
       body: JSON.stringify({ prompt, tone, persona }),

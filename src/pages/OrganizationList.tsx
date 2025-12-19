@@ -17,7 +17,7 @@ const OrganizationList: React.FC = () => {
   const fetchOrgs = async () => {
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/api/orgs/all`, {
+      const res = await fetch(`${API_BASE}/orgs/all`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -42,7 +42,7 @@ const OrganizationList: React.FC = () => {
 
     setMessage(null);
     try {
-      const res = await fetch(`${API_BASE}/api/orgs/`, {
+      const res = await fetch(`${API_BASE}/orgs/`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -71,7 +71,7 @@ const OrganizationList: React.FC = () => {
 
     setMessage(null);
     try {
-      const res = await fetch(`${API_BASE}/api/orgs/${orgId}`, {
+      const res = await fetch(`${API_BASE}/orgs/${orgId}`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,

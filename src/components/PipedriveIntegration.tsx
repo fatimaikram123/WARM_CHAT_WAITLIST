@@ -27,7 +27,7 @@ export default function PipedriveIntegration() {
   const checkStatus = async () => {
     try {
       const res = await fetch(
-        `${API_BASE}/api/crm/pipedrive/status/${orgId}`,
+        `${API_BASE}/crm/pipedrive/status/${orgId}`,
         { headers: { Authorization: `Bearer ${authToken}` } }
       );
       const data = await res.json();
@@ -50,7 +50,7 @@ export default function PipedriveIntegration() {
 
   // ---------------- Connect ----------------
   const handleConnect = () => {
-    window.location.href = `${API_BASE}/api/crm/connect-pipedrive?state=${orgId}`;
+    window.location.href = `${API_BASE}/crm/connect-pipedrive?state=${orgId}`;
   };
 
   // ---------------- Disconnect ----------------
@@ -59,7 +59,7 @@ export default function PipedriveIntegration() {
       setDisconnecting(true);
 
       await fetch(
-        `${API_BASE}/api/crm/disconnect-pipedrive/${orgId}`,
+        `${API_BASE}/crm/disconnect-pipedrive/${orgId}`,
         {
           method: "POST",
           headers: { Authorization: `Bearer ${authToken}` },
@@ -89,7 +89,7 @@ export default function PipedriveIntegration() {
 
     try {
       const res = await fetch(
-        `${API_BASE}/api/crm/fetch-pipedrive-leads/${ownerId}/${orgId}`,
+        `${API_BASE}/crm/fetch-pipedrive-leads/${ownerId}/${orgId}`,
         { headers: { Authorization: `Bearer ${authToken}` } }
       );
 
