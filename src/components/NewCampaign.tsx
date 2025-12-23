@@ -106,11 +106,11 @@ const NewCampaign: React.FC = () => {
         if (src === "added") {
           res = await fetch(`${API_BASE}/leads/${orgId}`, { headers: { Authorization: `Bearer ${token}` } });
         } else if (src === "hubspot") {
-          res = await fetch(`${API_BASE}/api/crm/fetch-leads/${ownerId}/${orgId}`, { headers: { Authorization: `Bearer ${token}` } });
+          res = await fetch(`${API_BASE}/crm/fetch-leads/${ownerId}/${orgId}`, { headers: { Authorization: `Bearer ${token}` } });
         } else if (src === "pipedrive") {
-          res = await fetch(`${API_BASE}/api/crm/fetch-pipedrive-leads/${ownerId}/${orgId}`, { headers: { Authorization: `Bearer ${token}` } });
+          res = await fetch(`${API_BASE}/crm/fetch-pipedrive-leads/${ownerId}/${orgId}`, { headers: { Authorization: `Bearer ${token}` } });
         } else if (src === "salesforce") {
-          res = await fetch(`${API_BASE}/api/crm/fetch-salesforce-leads/${ownerId}/${orgId}`, { headers: { Authorization: `Bearer ${token}` } });
+          res = await fetch(`${API_BASE}/crm/fetch-salesforce-leads/${ownerId}/${orgId}`, { headers: { Authorization: `Bearer ${token}` } });
         }
         const data = await res.json();
         const newLeads = Array.isArray(data) ? data : data.leads || [];

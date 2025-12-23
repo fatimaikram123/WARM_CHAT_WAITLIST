@@ -25,7 +25,7 @@ export default function HubSpotIntegration() {
   const checkConnection = async () => {
     try {
       const res = await fetch(
-        `${API_BASE}/api/crm/hubspot/status/${org_id}`,
+        `${API_BASE}/crm/hubspot/status/${org_id}`,
         {
           headers: { Authorization: `Bearer ${authToken}` },
         }
@@ -44,7 +44,7 @@ export default function HubSpotIntegration() {
 
   // ---------------- Connect HubSpot ----------------
   const handleConnect = () => {
-    window.location.href = `${API_BASE}/api/crm/connect-hubspot?state=${org_id}`;
+    window.location.href = `${API_BASE}/crm/connect-hubspot?state=${org_id}`;
   };
 
   // ---------------- Disconnect HubSpot ----------------
@@ -53,7 +53,7 @@ export default function HubSpotIntegration() {
       setDisconnecting(true);
 
       await fetch(
-        `${API_BASE}/api/crm/disconnect-hubspot/${org_id}`,
+        `${API_BASE}/crm/disconnect-hubspot/${org_id}`,
         {
           method: "POST",
           headers: { Authorization: `Bearer ${authToken}` },
@@ -84,7 +84,7 @@ export default function HubSpotIntegration() {
 
     try {
       const res = await fetch(
-        `${API_BASE}/api/crm/fetch-leads/${owner_id}/${org_id}`,
+        `${API_BASE}/crm/fetch-leads/${owner_id}/${org_id}`,
         {
           headers: { Authorization: `Bearer ${authToken}` },
         }
