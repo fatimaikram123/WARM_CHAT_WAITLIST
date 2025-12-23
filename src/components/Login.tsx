@@ -10,22 +10,45 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const handleAuthSuccess = (data: any) => {
+  const decoded = JSON.parse(atob(data.access_token.split(".")[1]));
+
+  localStorage.setItem("token", data.access_token);
+  localStorage.setItem("token_exp", (decoded.exp * 1000).toString());
+  localStorage.setItem("user_id", data.user_id);
+  localStorage.setItem("name", data.name);
+  localStorage.setItem("role_id", data.role_id);
+  localStorage.setItem("role_name", data.role_name);
+  localStorage.setItem("org_id", data.org_id);
+
+  toast.success("Welcome back!");
+
+  const onboardingComplete = localStorage.getItem("onboardingComplete");
+  if (onboardingComplete) {
+    // Returning user → go straight to dashboard
+    navigate("/dashboard");
+  } else {
+    // First-time login → start onboarding
+    navigate("/onboarding");
+  }
+};
+
 
   // 🔐 Shared success handler (used by BOTH login methods)
-  const handleAuthSuccess = (data: any) => {
-    const decoded = JSON.parse(atob(data.access_token.split(".")[1]));
+  // const handleAuthSuccess = (data: any) => {
+  //   const decoded = JSON.parse(atob(data.access_token.split(".")[1]));
 
-    localStorage.setItem("token", data.access_token);
-    localStorage.setItem("token_exp", (decoded.exp * 1000).toString());
-    localStorage.setItem("user_id", data.user_id);
-    localStorage.setItem("name", data.name);
-    localStorage.setItem("role_id", data.role_id);
-    localStorage.setItem("role_name", data.role_name);
-    localStorage.setItem("org_id", data.org_id);
+  //   localStorage.setItem("token", data.access_token);
+  //   localStorage.setItem("token_exp", (decoded.exp * 1000).toString());
+  //   localStorage.setItem("user_id", data.user_id);
+  //   localStorage.setItem("name", data.name);
+  //   localStorage.setItem("role_id", data.role_id);
+  //   localStorage.setItem("role_name", data.role_name);
+  //   localStorage.setItem("org_id", data.org_id);
 
-    toast.success("Welcome back!");
-    navigate("/dashboard");
-  };
+  //   toast.success("Welcome back!");
+  //   navigate("/dashboard");
+  // };
 
   // 🔐 EMAIL + PASSWORD LOGIN
   const handleSubmit = async (e: React.FormEvent) => {

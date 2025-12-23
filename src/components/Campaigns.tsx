@@ -34,10 +34,7 @@ export default function Campaigns() {
   /* ---------------- CLOSE DROPDOWN ON OUTSIDE CLICK ---------------- */
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(e.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setOpenDropdown(false);
       }
     };
@@ -50,14 +47,28 @@ export default function Campaigns() {
     if (!orgId || !token) return;
 
     const fetchCampaigns = async () => {
+      setLoading(true);
       try {
-        const res = await fetch(`${API_BASE}/campaigns/org/${orgId}`, {
-          headers: { Authorization: `Bearer ${token}` },
+        console.log("TOKEN:", token);
+        console.log("ORG ID:", orgId);
+
+        const res = await fetch(`${API_BASE}/campaigns/org/${Number(orgId)}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         });
+
+        if (!res.ok) {
+          const text = await res.text();
+          throw new Error(`Failed to fetch campaigns: ${res.status} ${text}`);
+        }
+
         const data = await res.json();
-        setCampaigns(data);
+        setCampaigns(Array.isArray(data) ? data : []);
       } catch (err) {
-        console.error("Error fetching campaigns:", err);
+        console.error(err);
+        setCampaigns([]);
       } finally {
         setLoading(false);
       }
@@ -73,24 +84,14 @@ export default function Campaigns() {
 
   const sortedCampaigns = [...filteredCampaigns].sort((a, b) => {
     if (sortKey === "replies") return b.replies - a.replies;
-    if (sortKey === "messages_sent")
-      return b.messages_sent_30d - a.messages_sent_30d;
+    if (sortKey === "messages_sent") return b.messages_sent_30d - a.messages_sent_30d;
     return 0;
   });
 
   /* ---------------- STATS ---------------- */
-  const totalMessages = campaigns.reduce(
-    (acc, c) => acc + (c.messages_sent_30d || 0),
-    0
-  );
-  const totalReplies = campaigns.reduce(
-    (acc, c) => acc + (c.replies || 0),
-    0
-  );
-  const replyRate =
-    totalMessages > 0
-      ? ((totalReplies / totalMessages) * 100).toFixed(1)
-      : "0";
+  const totalMessages = campaigns.reduce((acc, c) => acc + (c.messages_sent_30d || 0), 0);
+  const totalReplies = campaigns.reduce((acc, c) => acc + (c.replies || 0), 0);
+  const replyRate = totalMessages > 0 ? ((totalReplies / totalMessages) * 100).toFixed(1) : "0";
 
   return (
     <MainLayout>
@@ -110,18 +111,9 @@ export default function Campaigns() {
 
           {openDropdown && (
             <div className="absolute right-0 mt-2 w-56 bg-white border rounded-lg shadow-lg z-50">
-              <DropdownItem
-                label="➕ New Campaign"
-                onClick={() => navigate("/campaigns/new")}
-              />
-              <DropdownItem
-                label="📄 From Template"
-                onClick={() => navigate("/campaigns/templates")}
-              />
-              <DropdownItem
-                label="⭐ Duplicate Best Campaign"
-                onClick={() => alert("Duplicate best campaign")}
-              />
+              <DropdownItem label="➕ New Campaign" onClick={() => navigate("/campaigns/new")} />
+              <DropdownItem label="📄 From Template" onClick={() => navigate("/campaigns/templates")} />
+              <DropdownItem label="⭐ Duplicate Best Campaign" onClick={() => alert("Duplicate best campaign")} />
             </div>
           )}
         </div>
@@ -137,22 +129,14 @@ export default function Campaigns() {
 
       {/* FILTERS */}
       <div className="flex gap-4 mb-4">
-        <select
-          className="border rounded px-3 py-1"
-          value={filterStatus || ""}
-          onChange={(e) => setFilterStatus(e.target.value || null)}
-        >
+        <select className="border rounded px-3 py-1" value={filterStatus || ""} onChange={(e) => setFilterStatus(e.target.value || null)}>
           <option value="">All Status</option>
           <option value="Running">Running</option>
           <option value="Paused">Paused</option>
           <option value="Completed">Completed</option>
         </select>
 
-        <select
-          className="border rounded px-3 py-1"
-          value={sortKey || ""}
-          onChange={(e) => setSortKey(e.target.value || null)}
-        >
+        <select className="border rounded px-3 py-1" value={sortKey || ""} onChange={(e) => setSortKey(e.target.value || null)}>
           <option value="">Sort by</option>
           <option value="replies">Replies</option>
           <option value="messages_sent">Messages Sent (30d)</option>
@@ -170,9 +154,7 @@ export default function Campaigns() {
                 <th className="text-left px-5 py-3">Campaign</th>
                 <th className="text-left px-5 py-3">Status</th>
                 <th className="text-left px-5 py-3">Replies</th>
-                <th className="text-left px-5 py-3">
-                  Messages Sent (30d)
-                </th>
+                <th className="text-left px-5 py-3">Messages Sent (30d)</th>
                 <th className="text-left px-5 py-3">Actions</th>
               </tr>
             </thead>
@@ -187,21 +169,9 @@ export default function Campaigns() {
                   <td className="px-5 py-3">{c.messages_sent_30d}</td>
                   <td className="px-5 py-3">
                     <div className="flex gap-4">
-                      <ActionButton
-                        label="▶ / ⏸"
-                        color="text-green-600"
-                        onClick={() => alert("Resume / Pause")}
-                      />
-                      <ActionButton
-                        label="📊 View"
-                        color="text-purple-600"
-                        onClick={() => navigate(`/campaigns/${c.id}`)}
-                      />
-                      <ActionButton
-                        label="📋 Duplicate"
-                        color="text-gray-600"
-                        onClick={() => alert("Duplicate")}
-                      />
+                      <ActionButton label="▶ / ⏸" color="text-green-600" onClick={() => alert("Resume / Pause")} />
+                      <ActionButton label="📊 View" color="text-purple-600" onClick={() => navigate(`/campaigns/${c.id}`)} />
+                      <ActionButton label="📋 Duplicate" color="text-gray-600" onClick={() => alert("Duplicate")} />
                     </div>
                   </td>
                 </tr>
@@ -215,13 +185,9 @@ export default function Campaigns() {
 }
 
 /* ---------------- COMPONENTS ---------------- */
-
 function DropdownItem({ label, onClick }: any) {
   return (
-    <button
-      onClick={onClick}
-      className="w-full text-left px-4 py-2 hover:bg-orange-50 text-sm"
-    >
+    <button onClick={onClick} className="w-full text-left px-4 py-2 hover:bg-orange-50 text-sm">
       {label}
     </button>
   );
@@ -237,18 +203,8 @@ function Stat({ title, value }: any) {
 }
 
 function StatusBadge({ status }: any) {
-  const styles =
-    status === "Running"
-      ? "bg-green-100 text-green-600"
-      : status === "Paused"
-      ? "bg-yellow-100 text-yellow-600"
-      : "bg-gray-100 text-gray-600";
-
-  return (
-    <span className={`px-3 py-1 text-xs rounded-full ${styles}`}>
-      {status}
-    </span>
-  );
+  const styles = status === "Running" ? "bg-green-100 text-green-600" : status === "Paused" ? "bg-yellow-100 text-yellow-600" : "bg-gray-100 text-gray-600";
+  return <span className={`px-3 py-1 text-xs rounded-full ${styles}`}>{status}</span>;
 }
 
 function ActionButton({ label, color, onClick }: any) {

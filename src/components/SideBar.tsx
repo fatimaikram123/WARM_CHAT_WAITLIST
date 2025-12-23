@@ -146,7 +146,14 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                 icon={Building2}
                 text="Organization"
               />
+               <NavItem
+                to="/manage/users"
+                icon={Building2}
+                text="Manage Users"
+              />
             </Section>
+            
+           
           )}
 
           {/* Guest */}
