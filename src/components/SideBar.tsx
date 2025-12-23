@@ -19,17 +19,26 @@ import {
 import { NavLink, useNavigate } from "react-router-dom";
 import { ROLES } from "../constants/roles";
 
+/**
+ * ROLE IDS (example – adjust if different)
+ * 1 = Guest
+ * 2 = Admin
+ * 3 = Representative
+ * 4 = Manager
+ */
+
 export default function Sidebar({ isOpen, toggleSidebar }) {
   const navigate = useNavigate();
 
-  const roleId = parseInt(localStorage.getItem("role_id"), 10);
+  const roleId = Number(localStorage.getItem("role_id"));
+
   const role =
     roleId === 2
       ? ROLES.ADMIN
       : roleId === 4
       ? ROLES.MANAGER
       : roleId === 3
-      ? ROLES.AGENT
+      ? ROLES.REPRESENTATIVE
       : ROLES.GUEST;
 
   useEffect(() => {
@@ -77,51 +86,61 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
         {/* Menu */}
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
 
-          {/* Dashboard */}
-          <Section title="Dashboard">
-            <NavItem to="/dashboard" icon={LayoutDashboard} text="Dashboard" />
-          </Section>
+          {/* Dashboard (All except Guest) */}
+          {canView([ROLES.ADMIN, ROLES.MANAGER, ROLES.REPRESENTATIVE]) && (
+            <Section title="Dashboard">
+              <NavItem to="/dashboard" icon={LayoutDashboard} text="Dashboard" />
+            </Section>
+          )}
 
           {/* Outreach */}
-          <Section title="Outreach">
-            <NavItem to="/campaigns" icon={Megaphone} text="Campaigns" />
-            <NavItem
-              to="/sequences"
-              icon={Repeat}
-              text="Smart Follow-Ups"
-            />
-          </Section>
+          {canView([ROLES.ADMIN, ROLES.MANAGER, ROLES.REPRESENTATIVE]) && (
+            <Section title="Outreach">
+              <NavItem to="/campaigns" icon={Megaphone} text="Campaigns" />
+              <NavItem
+                to="/sequences"
+                icon={Repeat}
+                text="Smart Follow-Ups"
+              />
+            </Section>
+          )}
 
           {/* Inbox */}
-          <Section title="Inbox">
-            <NavItem to="/inbox" icon={Inbox} text="Unified Inbox" />
-          </Section>
+          {canView([ROLES.ADMIN, ROLES.MANAGER, ROLES.REPRESENTATIVE]) && (
+            <Section title="Inbox">
+              <NavItem to="/inbox" icon={Inbox} text="Unified Inbox" />
+            </Section>
+          )}
 
           {/* Leads */}
-          <Section title="Leads">
-            <NavItem to="/leads" icon={Users} text="Lead Management" />
-          </Section>
+          {canView([ROLES.ADMIN, ROLES.MANAGER, ROLES.REPRESENTATIVE]) && (
+            <Section title="Leads">
+              <NavItem to="/leads" icon={Users} text="Lead Management" />
+            </Section>
+          )}
 
           {/* Messages */}
-          <Section title="Messages">
-            <NavItem
-              to="/ai-writer"
-              icon={Sparkles}
-              text="AI Message Generator"
-            />
-            <NavItem
-              to="/manage/templates"
-              icon={Sparkles}
-              text="Message Templates"
-            />
-            <NavItem
-              to="/view/templates"
-              icon={Sparkles}
-              text="Templates Library"
-            />
-          </Section>
+          {canView([ROLES.ADMIN, ROLES.MANAGER, ROLES.REPRESENTATIVE]) && (
+            <Section title="Messages">
+              <NavItem
+                to="/ai-writer"
+                icon={Sparkles}
+                text="AI Message Generator"
+              />
+              <NavItem
+                to="/manage/templates"
+                icon={Sparkles}
+                text="Message Templates"
+              />
+              <NavItem
+                to="/view/templates"
+                icon={Sparkles}
+                text="Templates Library"
+              />
+            </Section>
+          )}
 
-          {/* Integrations */}
+          {/* Integrations (Admin + Manager only) */}
           {canView([ROLES.ADMIN, ROLES.MANAGER]) && (
             <Section title="Integrations">
               <NavItem to="/integrations/hubspot" icon={Link} text="HubSpot" />
@@ -146,14 +165,12 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
                 icon={Building2}
                 text="Organization"
               />
-               <NavItem
+              <NavItem
                 to="/manage/users"
                 icon={Building2}
                 text="Manage Users"
               />
             </Section>
-            
-           
           )}
 
           {/* Guest */}
@@ -161,6 +178,11 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
             <Section title="Support">
               <NavItem to="/waitlist" icon={Rocket} text="Join Waitlist" />
               <NavItem to="/help" icon={HelpCircle} text="Help Center" />
+                <NavItem
+                to="/ai-writer"
+                icon={Sparkles}
+                text="AI Message Generator"
+              />
             </Section>
           )}
         </div>
