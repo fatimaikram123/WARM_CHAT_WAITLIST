@@ -69,7 +69,7 @@ const SequenceBuilder: React.FC = () => {
     };
 
     try {
-    //   const res = await fetch('/api/sequences', {
+    //   const res = await fetch('/sequences', {
     //     method: 'POST',
     //     headers: { 'Content-Type': 'application/json' },
     //     body: JSON.stringify(payload),

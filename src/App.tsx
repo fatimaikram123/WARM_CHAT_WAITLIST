@@ -45,6 +45,7 @@ import TemplateLibrary from "./components/TemplateLibrary";
 import ForgotPassword from "./components/ForgotPassword";
 import ResetPassword from "./components/ResetPassword";
 import ConfirmEmail from "./components/ConfirmEmail";
+import Onboarding from "./components/Onboarding";
 const queryClient = new QueryClient();
 
 const App: React.FC = () => {
@@ -131,6 +132,14 @@ const App: React.FC = () => {
             element={
               <RoleProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.MANAGER, ROLES.AGENT, ROLES.GUEST]}>
                 <Dashboard />
+              </RoleProtectedRoute>
+            }
+          />
+           <Route
+            path="/onboarding"
+            element={
+              <RoleProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.MANAGER, ROLES.AGENT,ROLES.GUEST]}>
+                <Onboarding />
               </RoleProtectedRoute>
             }
           />
@@ -308,7 +317,7 @@ const App: React.FC = () => {
           <Route
             path="/create-followup"
             element={
-              <RoleProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.MANAGER, ROLES.AGENT]}>
+              <RoleProtectedRoute allowedRoles={[ROLES.ADMIN, ROLES.MANAGER, ROLES.AGENT,ROLES.GUEST]}>
                 <CreateFollowUp />
               </RoleProtectedRoute>
             }

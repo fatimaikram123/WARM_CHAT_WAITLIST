@@ -1,12 +1,27 @@
 import React, { useEffect } from "react";
-import { ChevronDown, Menu, X } from "lucide-react";
+import {
+  ChevronDown,
+  Menu,
+  X,
+  LayoutDashboard,
+  Repeat,
+  Megaphone,
+  Inbox,
+  Users,
+  Sparkles,
+  Link,
+  Briefcase,
+  TrendingUp,
+  Rocket,
+  HelpCircle,
+  Building2,
+} from "lucide-react";
 import { NavLink, useNavigate } from "react-router-dom";
-import {ROLES} from "../constants/roles"
+import { ROLES } from "../constants/roles";
 
 export default function Sidebar({ isOpen, toggleSidebar }) {
   const navigate = useNavigate();
 
-  // ✅ Get role_id from localStorage (default to guest if missing)
   const roleId = parseInt(localStorage.getItem("role_id"), 10);
   const role =
     roleId === 2
@@ -17,329 +32,137 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
       ? ROLES.AGENT
       : ROLES.GUEST;
 
-  // Auto-close sidebar on mobile
   useEffect(() => {
     if (window.innerWidth < 1024 && isOpen) toggleSidebar();
     // eslint-disable-next-line
   }, []);
 
-  const activeLink =
-    "text-orange-600 font-semibold bg-orange-50 rounded-lg px-3 py-2 block text-base";
-  const normalLink =
-    "hover:text-orange-500 hover:bg-orange-50 rounded-lg px-3 py-2 block text-base transition";
+  const canView = (allowedRoles) => allowedRoles.includes(role);
 
-  // ✅ Logout clearing updated localStorage
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user_id");
-    localStorage.removeItem("name");
-    localStorage.removeItem("role_id");
-    localStorage.removeItem("role_name");
-    localStorage.removeItem("org_id");
-    localStorage.removeItem("gmail_user_name");
-    localStorage.removeItem("gmail_email_id");
-    localStorage.removeItem("email");
-    localStorage.removeItem("org_name");
-    localStorage.removeItem("session")
-    localStorage.removeItem("pipedrive_token");
-    localStorage.removeItem("pipedrive_connected");
-
-
+    localStorage.clear();
     navigate("/login");
   };
 
-  // 🔹 Helpers for role-based visibility
-  const canView = (allowedRoles) => allowedRoles.includes(role);
-
   return (
     <>
-      {/* Hamburger Button (mobile only) */}
+      {/* Mobile Toggle */}
       <button
         onClick={toggleSidebar}
-        className="lg:hidden fixed top-4 left-4 z-50 bg-white border border-gray-200 rounded-md p-2 shadow-md"
+        className="lg:hidden fixed top-4 left-4 z-50 bg-white border rounded-md p-2 shadow"
       >
-        {isOpen ? (
-          <X className="w-6 h-6 text-orange-500" />
-        ) : (
-          <Menu className="w-6 h-6 text-orange-500" />
-        )}
+        {isOpen ? <X /> : <Menu />}
       </button>
 
-      {/* Background Overlay (mobile only) */}
       {isOpen && (
         <div
           className="fixed inset-0 bg-black/40 z-30 lg:hidden"
           onClick={toggleSidebar}
-        ></div>
+        />
       )}
 
-      {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-full w-72 z-40 flex flex-col border-r border-gray-200 shadow-lg transform transition-transform duration-300
-          ${isOpen ? "translate-x-0" : "-translate-x-full"}
-          lg:translate-x-0
-          bg-white lg:bg-gradient-to-b lg:from-white lg:to-orange-50/30
-        `}
+        className={`fixed top-0 left-0 z-40 w-72 bg-white border-r shadow-lg
+        transform transition-transform lg:translate-x-0
+        ${isOpen ? "translate-x-0" : "-translate-x-full"}
+        flex flex-col h-screen`}
       >
         {/* Logo */}
-        <div className="flex items-center justify-center py-8 border-b border-gray-200">
-          <span className="text-3xl font-extrabold text-orange-500 tracking-tight">
+        <div className="py-8 text-center border-b shrink-0">
+          <span className="text-3xl font-extrabold text-orange-500">
             WarmChats
           </span>
         </div>
 
-        {/* Navigation */}
-        <ul className="flex flex-col flex-grow p-6 space-y-6 text-gray-800 font-medium overflow-y-auto">
-          {/* === FEATURES === */}
-          <li>
-            <div className="flex items-center justify-between px-2 mb-2">
-              <span className="text-lg font-semibold text-gray-700">
-                Features
-              </span>
-              <ChevronDown className="w-4 h-4 text-gray-500" />
-            </div>
-            <ul className="ml-3 space-y-2 border-l-2 border-orange-100 pl-3">
-              {/* All users including guests can view Dashboard */}
-              {canView([
-                ROLES.ADMIN,
-                ROLES.MANAGER,
-                ROLES.AGENT
-               
-              ]) && (
-                <li>
-                  <NavLink
-                    to="/dashboard"
-                    className={({ isActive }) =>
-                      isActive ? activeLink : normalLink
-                    }
-                  >
-                    📊 Dashboard
-                  </NavLink>
-                </li>
-              )}
+        {/* Menu */}
+        <div className="flex-1 overflow-y-auto px-6 py-6 space-y-8">
 
-              {/* Non-guests */}
-              {canView([ROLES.ADMIN, ROLES.MANAGER, ROLES.AGENT]) && (
-                <>
-                  <li>
-                    <NavLink
-                      to="/campaigns"
-                      className={({ isActive }) =>
-                        isActive ? activeLink : normalLink
-                      }
-                    >
-                      📢 Multichannel Campaigns
-                    </NavLink>
-                  </li>
-                 
-                  <li>
-                    <NavLink
-                      to="/sequences"
-                      className={({ isActive }) =>
-                        isActive ? activeLink : normalLink
-                      }
-                    >
-                      🔁 Smart Follow-Ups
-                    </NavLink>
-                  </li>
-                  <li>
-                   
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/inbox"
-                      className={({ isActive }) =>
-                        isActive ? activeLink : normalLink
-                      }
-                    >
-                      📬 Unified Inbox
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/leads"
-                      className={({ isActive }) =>
-                        isActive ? activeLink : normalLink
-                      }
-                    >
-                      👥 Lead Management
-                    </NavLink>
-                  </li>
-                    <li>
-                    <NavLink
-                      to="/thread/leads"
-                      className={({ isActive }) =>
-                        isActive ? activeLink : normalLink
-                      }
-                    >
-                      👥 Threads Lead Assignment 
-                    </NavLink>
-                  </li>
+          {/* Dashboard */}
+          <Section title="Dashboard">
+            <NavItem to="/dashboard" icon={LayoutDashboard} text="Dashboard" />
+          </Section>
 
-                   
-                </>
-              )}
+          {/* Outreach */}
+          <Section title="Outreach">
+            <NavItem to="/campaigns" icon={Megaphone} text="Campaigns" />
+            <NavItem
+              to="/sequences"
+              icon={Repeat}
+              text="Smart Follow-Ups"
+            />
+          </Section>
 
-              {/* Guest rights — view-only screens */}
-              {canView([ROLES.GUEST]) && (
-                <>
-                  <li>
-                    <NavLink
-                      to="/waitlist"
-                      className={({ isActive }) =>
-                        isActive ? activeLink : normalLink
-                      }
-                    >
-                      🚀 Join Waitlist
-                    </NavLink>
-                  </li>
-                  <li>
-                    <NavLink
-                      to="/help"
-                      className={({ isActive }) =>
-                        isActive ? activeLink : normalLink
-                      }
-                    >
-                      💬 Help Center
-                    </NavLink>
-                  </li>
-                </>
-              )}
-            </ul>
-          </li>
-             <li>
-    <div className="flex items-center justify-between px-2 mb-2">
-      <span className="text-lg font-semibold text-gray-700">Message Generator</span>
-      <ChevronDown className="w-4 h-4 text-gray-500" />
-    </div>
+          {/* Inbox */}
+          <Section title="Inbox">
+            <NavItem to="/inbox" icon={Inbox} text="Unified Inbox" />
+          </Section>
 
-    <ul className="ml-3 space-y-2 border-l-2 border-orange-100 pl-3">
-      {canView([ROLES.ADMIN, ROLES.MANAGER, ROLES.AGENT, ROLES.GUEST]) && (
-       
-        <div>
-          <li>
-            <NavLink to="/ai-writer" className={({ isActive }) => isActive ? activeLink : normalLink}>
-              🧠 AI Message Writer
-            </NavLink>
-          </li>   
-        </div>
-        )}
-      {canView([ROLES.ADMIN, ROLES.MANAGER,ROLES.AGENT]) && (
-        <div>
-          <li>
-            <NavLink to="/manage/templates" className={({ isActive }) => isActive ? activeLink : normalLink}>
-              🧠 Manage Templates
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/view/templates" className={({ isActive }) => isActive ? activeLink : normalLink}>
-              🧠  Templates Library
-            </NavLink>
-          </li>
-          </div>
-          
-      )}
+          {/* Leads */}
+          <Section title="Leads">
+            <NavItem to="/leads" icon={Users} text="Lead Management" />
+          </Section>
 
-    </ul>
-  </li>
+          {/* Messages */}
+          <Section title="Messages">
+            <NavItem
+              to="/ai-writer"
+              icon={Sparkles}
+              text="AI Message Generator"
+            />
+            <NavItem
+              to="/manage/templates"
+              icon={Sparkles}
+              text="Message Templates"
+            />
+            <NavItem
+              to="/view/templates"
+              icon={Sparkles}
+              text="Templates Library"
+            />
+          </Section>
 
-          {/* === INTEGRATIONS === */}
+          {/* Integrations */}
           {canView([ROLES.ADMIN, ROLES.MANAGER]) && (
-            <li>
-              <div className="flex items-center justify-between px-2 mb-2">
-                <span className="text-lg font-semibold text-gray-700">
-                  Integrations
-                </span>
-                <ChevronDown className="w-4 h-4 text-gray-500" />
-              </div>
-              <ul className="ml-3 space-y-2 border-l-2 border-orange-100 pl-3">
-                <li>
-                  <NavLink
-                    to="/integrations/hubspot"
-                    className={({ isActive }) =>
-                      isActive ? activeLink : normalLink
-                    }
-                  >
-                    🔗 HubSpot
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/integrations/salesforce"
-                    className={({ isActive }) =>
-                      isActive ? activeLink : normalLink
-                    }
-                  >
-                    💼 Salesforce
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink
-                    to="/integrations/pipedrive"
-                    className={({ isActive }) =>
-                      isActive ? activeLink : normalLink
-                    }
-                  >
-                    📈 Pipedrive
-                  </NavLink>
-                </li>
-              </ul>
-            </li>
+            <Section title="Integrations">
+              <NavItem to="/integrations/hubspot" icon={Link} text="HubSpot" />
+              <NavItem
+                to="/integrations/salesforce"
+                icon={Briefcase}
+                text="Salesforce"
+              />
+              <NavItem
+                to="/integrations/pipedrive"
+                icon={TrendingUp}
+                text="Pipedrive"
+              />
+            </Section>
           )}
 
-          {/* === ADMIN SECTIONS === */}
+          {/* Admin */}
           {canView([ROLES.ADMIN]) && (
-            <>
-              <li>
-                <div className="flex items-center justify-between px-2 mb-2">
-                  <span className="text-lg font-semibold text-gray-700">
-                    Manage Users
-                  </span>
-                  <ChevronDown className="w-4 h-4 text-gray-500" />
-                </div>
-                <ul className="ml-3 space-y-2 border-l-2 border-orange-100 pl-3">
-                  <li>
-                    <NavLink
-                      to="/manage/users"
-                      className={({ isActive }) =>
-                        isActive ? activeLink : normalLink
-                      }
-                    >
-                      👥 Update Users
-                    </NavLink>
-                  </li>
-                </ul>
-              </li>
-
-              <li>
-                <div className="flex items-center justify-between px-2 mb-2">
-                  <span className="text-lg font-semibold text-gray-700">
-                    Manage Organization
-                  </span>
-                  <ChevronDown className="w-4 h-4 text-gray-500" />
-                </div>
-                <ul className="ml-3 space-y-2 border-l-2 border-orange-100 pl-3">
-                  <li>
-                    <NavLink
-                      to="/organizations"
-                      className={({ isActive }) =>
-                        isActive ? activeLink : normalLink
-                      }
-                    >
-                      🏢 Organization
-                    </NavLink>
-                  </li>
-                </ul>
-              </li>
-            </>
+            <Section title="Admin">
+              <NavItem
+                to="/organizations"
+                icon={Building2}
+                text="Organization"
+              />
+            </Section>
           )}
-        </ul>
+
+          {/* Guest */}
+          {canView([ROLES.GUEST]) && (
+            <Section title="Support">
+              <NavItem to="/waitlist" icon={Rocket} text="Join Waitlist" />
+              <NavItem to="/help" icon={HelpCircle} text="Help Center" />
+            </Section>
+          )}
+        </div>
 
         {/* Footer */}
-        <div className="p-6 border-t border-gray-200">
+        <div className="p-6 border-t shrink-0">
           <button
             onClick={handleLogout}
-            className="w-full px-4 py-2 border border-orange-400 text-orange-500 font-semibold rounded-lg hover:bg-orange-500 hover:text-white transition text-base"
+            className="w-full border border-orange-400 text-orange-500 font-semibold rounded-lg py-2 hover:bg-orange-500 hover:text-white transition"
           >
             Logout
           </button>
@@ -348,3 +171,31 @@ export default function Sidebar({ isOpen, toggleSidebar }) {
     </>
   );
 }
+
+/* ---------- Helpers ---------- */
+
+const Section = ({ title, children }) => (
+  <div>
+    <div className="flex items-center justify-between mb-3 text-xs uppercase tracking-wide text-gray-500 font-semibold">
+      <span>{title}</span>
+      <ChevronDown className="w-4 h-4 opacity-60" />
+    </div>
+    <ul className="ml-3 border-l-2 border-orange-100 pl-3 space-y-2">
+      {children}
+    </ul>
+  </div>
+);
+
+const NavItem = ({ to, icon: Icon, text }) => (
+  <NavLink
+    to={to}
+    className={({ isActive }) =>
+      isActive
+        ? "flex items-center gap-3 text-orange-600 font-semibold bg-orange-50 rounded-lg px-3 py-2"
+        : "flex items-center gap-3 text-gray-700 hover:text-orange-500 hover:bg-orange-50 rounded-lg px-3 py-2 transition"
+    }
+  >
+    <Icon className="w-5 h-5" />
+    <span>{text}</span>
+  </NavLink>
+);
